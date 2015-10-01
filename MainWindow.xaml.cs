@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.IO;
@@ -19,10 +18,11 @@ namespace Cider_x64
             DesignerProperties.IsInDesignModeProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.OverridesInheritanceBehavior | FrameworkPropertyMetadataOptions.Inherits));
         }
 
+        LoaderFactory m_LoaderFactory = new LoaderFactory();
         public MainWindow()
         {
-            this.Initialized += MainWindow_Initialized;
-            this.Closed += MainWindow_Closed;
+            Initialized += MainWindow_Initialized;
+            Closed += MainWindow_Closed;
 
             InitializeComponent();
 
@@ -35,7 +35,7 @@ namespace Cider_x64
 
             try
             {
-                _fsWatcher = new System.IO.FileSystemWatcher(System.IO.Path.GetDirectoryName(_assemblyPath));
+                _fsWatcher = new FileSystemWatcher(Path.GetDirectoryName(_assemblyPath));
                 _fsWatcher.Changed += fsWatcher_Changed;
                 _fsWatcher.EnableRaisingEvents = true;
             }
@@ -108,81 +108,39 @@ namespace Cider_x64
         string _assemblyPath; // full path to assembly.dll
         string _typeName; // string of "namespace.classname" of type to instantiate
 
-        string getShadowCopyPath(string origiAssembly)
-        {
-            string path = System.IO.Path.GetDirectoryName(origiAssembly);
-            string filenameNoExtension = System.IO.Path.GetFileNameWithoutExtension(origiAssembly);
-            string fileExtension = System.IO.Path.GetExtension(origiAssembly);
-
-            string shadowCopyPath = System.IO.Path.Combine(path, filenameNoExtension + " - Copy" + fileExtension);
-            return shadowCopyPath;
-        }
-
-        System.IO.FileSystemWatcher _fsWatcher;
+        FileSystemWatcher _fsWatcher;
 
         void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             bool isVisible = (bool)e.NewValue;
             if (isVisible)
-                reshowWindow(_assemblyPath, _typeName);
-        }
-
-        private void reshowWindow(string assemblyPath, string typeName)
-        {
-            if (string.IsNullOrEmpty(assemblyPath) || string.IsNullOrEmpty(typeName))
-                return;
-
-            try
             {
-                File.Copy(assemblyPath, getShadowCopyPath(_assemblyPath), true);
+
+                ILoader loader = m_LoaderFactory.Create();
+
+                // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
+                //string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
+                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly1.dll"));
+                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly2.dll"));
+                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly3.dll"));
+                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly4.dll"));
+
+                //loader.AddMergedDictionary("pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml");
+
+                loader.Show(_assemblyPath, _typeName);
             }
-            catch (System.Exception)
-            {
-                this.Dispatcher.BeginInvoke(new Action(() => reshowWindow(assemblyPath, typeName)), DispatcherPriority.Normal, null);
-                return;
-            }
-
-            // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
-            string assemblyDirectory = System.IO.Path.GetDirectoryName(assemblyPath);
-            Assembly.LoadFrom(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly1.dll"));
-            Assembly.LoadFrom(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly2.dll"));
-            Assembly.LoadFrom(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly3.dll"));
-            Assembly.LoadFrom(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly4.dll"));
-
-            ResourceDictionary xamlDictionaryToMerge = new ResourceDictionary();
-            xamlDictionaryToMerge.Source = new Uri("pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml");
-            Application.Current.Resources.MergedDictionaries.Add(xamlDictionaryToMerge);
-
-            Assembly assembly = Assembly.LoadFrom(getShadowCopyPath(_assemblyPath));
-            Type typeToCreate = assembly.GetType(typeName);
-            object instanceCreated = Activator.CreateInstance(typeToCreate);
-            displayWpfGuiPreview(instanceCreated as Window);
-            displayWpfGuiPreview(instanceCreated as UserControl);
         }
 
-        private void displayWpfGuiPreview(Window instanceCreated)
-        {
-            if (instanceCreated == null)
-                return;
-
-            instanceCreated.Owner = this;
-            instanceCreated.Left = this.Left;
-            instanceCreated.Top = this.Top;
-            instanceCreated.Show();
-        }
-
-        private void displayWpfGuiPreview(UserControl instanceCreated)
-        {
-            if (instanceCreated == null)
-                return;
-
-            this.root.Children.Add(instanceCreated);
-        }
-
+        bool _restartPending = false;
         void fsWatcher_Changed(object sender, System.IO.FileSystemEventArgs e)
         {
-            if (e.FullPath == _assemblyPath)
+            string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
+            if (Path.GetDirectoryName(e.FullPath) == assemblyDirectory)
             {
+                if (_restartPending)
+                    return;
+                _restartPending = true;
+
                 _fsWatcher.EnableRaisingEvents = false;
 
                 RestartButton_Click(null, null);
@@ -197,6 +155,26 @@ namespace Cider_x64
                 Application.Current.Shutdown();
             })
                 , DispatcherPriority.Normal, null);
+        }
+    }
+
+
+    internal class LoaderFactory
+    {
+        ILoader m_Loader = null;
+        AppDomain m_LoaderDomain = null;
+
+        public ILoader Create()
+        {
+            AppDomainSetup adSetup = new AppDomainSetup();
+            adSetup.ShadowCopyFiles = "true"; // not a boolean
+
+            string selfAssemblyName = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
+
+            m_LoaderDomain = AppDomain.CreateDomain("GUI Preview Domain", null, adSetup);
+            m_Loader = (ILoader) m_LoaderDomain.CreateInstanceFromAndUnwrap(selfAssemblyName, "Cider_x64.Loader");
+
+            return m_Loader;
         }
     }
 }
