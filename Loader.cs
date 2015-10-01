@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,7 +24,19 @@ namespace Cider_x64
 
         public void Show(string assemblyPath, string namespaceDotType)
         {
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
+            if (string.IsNullOrEmpty(assemblyPath) || string.IsNullOrEmpty(namespaceDotType))
+                return; // settings uninitialized
+
+            Assembly assembly;
+            try
+            {
+                assembly = Assembly.LoadFrom(assemblyPath);
+            }
+            catch(FileNotFoundException)
+            {
+                return; // wrong assembly path specified
+            }
+
             Type typeToCreate = assembly.GetType(namespaceDotType);
             object instanceCreated = Activator.CreateInstance(typeToCreate);
 
