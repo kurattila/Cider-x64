@@ -3,7 +3,6 @@ using System.Windows;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Windows.Threading;
 
 namespace Cider_x64
@@ -13,10 +12,7 @@ namespace Cider_x64
     /// </summary>
     public partial class MainWindow : Window
     {
-        static MainWindow()
-        {
-            DesignerProperties.IsInDesignModeProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.OverridesInheritanceBehavior | FrameworkPropertyMetadataOptions.Inherits));
-        }
+        WindowConfiguration m_WindowConfig = new WindowConfiguration("MainWindow");
 
         LoaderFactory m_LoaderFactory = new LoaderFactory();
         public MainWindow()
@@ -49,48 +45,27 @@ namespace Cider_x64
 
         string _appRegistryBranch = "Cider-x64";
         string _appVersion = "1.0.0";
-        static readonly int _undefinedWindowPosition = -10000;
         void MainWindow_Initialized(object sender, EventArgs e)
         {
-            int leftPos = 0;
-            int topPos = 0;
-            int width = 0;
-            int height = 0;
-
-            string leftRaw = getAppSettingsRegistrykey().GetValue("Left", MainWindow._undefinedWindowPosition) as string;
-            if (leftRaw != null)
-                leftPos = int.Parse(leftRaw);
-
-            string topRaw = getAppSettingsRegistrykey().GetValue("Top", MainWindow._undefinedWindowPosition) as string;
-            if (topRaw != null)
-                topPos = int.Parse(topRaw);
-
-            string widthRaw = getAppSettingsRegistrykey().GetValue("Width", MainWindow._undefinedWindowPosition) as string;
-            if (widthRaw != null)
-                width = int.Parse(widthRaw);
-
-            string heightRaw = getAppSettingsRegistrykey().GetValue("Height", MainWindow._undefinedWindowPosition) as string;
-            if (heightRaw != null)
-                height = int.Parse(heightRaw);
-
-            if (leftPos != MainWindow._undefinedWindowPosition
-                && topPos != MainWindow._undefinedWindowPosition)
+            m_WindowConfig.LoadSettings();
+            if (m_WindowConfig.ValidSettings())
             {
-                this.Left = leftPos;
-                this.Top = topPos;
-                if (width > 0)
-                    this.Width = width;
-                if (height > 0)
-                    this.Height = height;
+                this.Left = m_WindowConfig.Left;
+                this.Top = m_WindowConfig.Top;
+                this.Width = m_WindowConfig.Width;
+                this.Height = m_WindowConfig.Height;
             }
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
         {
-            getAppSettingsRegistrykey().SetValue("Left", this.Left);
-            getAppSettingsRegistrykey().SetValue("Top", this.Top);
-            getAppSettingsRegistrykey().SetValue("Width", this.Width);
-            getAppSettingsRegistrykey().SetValue("Height", this.Height);
+            m_Loader.CloseWindow();
+
+            m_WindowConfig.Left = (int)Left;
+            m_WindowConfig.Top = (int)Top;
+            m_WindowConfig.Width = (int)Width;
+            m_WindowConfig.Height = (int)Height;
+            m_WindowConfig.SaveSettings();
         }
 
         RegistryKey getAppSettingsRegistrykey()
@@ -110,24 +85,29 @@ namespace Cider_x64
 
         FileSystemWatcher _fsWatcher;
 
+        ILoader m_Loader;
         void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             bool isVisible = (bool)e.NewValue;
             if (isVisible)
             {
+                string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
+                Directory.SetCurrentDirectory(assemblyDirectory);
 
-                ILoader loader = m_LoaderFactory.Create();
+                m_Loader = m_LoaderFactory.Create();
 
                 // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
-                //string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
-                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly1.dll"));
-                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly2.dll"));
-                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly3.dll"));
-                //loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, "SomeGuiAssembly4.dll"));
+                string[] assembliesToPreload = getAppSettingsRegistrykey().GetValue("GuiPreview-ToPreloadAssemblies") as string[];
+                foreach (string assemblyToPreload in assembliesToPreload)
+                {
+                    m_Loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, assemblyToPreload));
+                }
 
-                //loader.AddMergedDictionary("pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml");
+                // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
+                string mergedDirectoryToAdd = getAppSettingsRegistrykey().GetValue("GuiPreview-ToAddMergedDictionary") as string;
+                m_Loader.AddMergedDictionary(mergedDirectoryToAdd);
 
-                loader.Show(_assemblyPath, _typeName);
+                m_Loader.Show(_assemblyPath, _typeName);
             }
         }
 
@@ -143,38 +123,14 @@ namespace Cider_x64
 
                 _fsWatcher.EnableRaisingEvents = false;
 
-                RestartButton_Click(null, null);
+                requestAppRestart(null, null);
             }
         }
 
-        private void RestartButton_Click(object sender, RoutedEventArgs e)
+        AppRestarter m_Restarter = new AppRestarter();
+        virtual protected void requestAppRestart(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location, null);
-                Application.Current.Shutdown();
-            })
-                , DispatcherPriority.Normal, null);
-        }
-    }
-
-
-    internal class LoaderFactory
-    {
-        ILoader m_Loader = null;
-        AppDomain m_LoaderDomain = null;
-
-        public ILoader Create()
-        {
-            AppDomainSetup adSetup = new AppDomainSetup();
-            adSetup.ShadowCopyFiles = "true"; // not a boolean
-
-            string selfAssemblyName = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
-
-            m_LoaderDomain = AppDomain.CreateDomain("GUI Preview Domain", null, adSetup);
-            m_Loader = (ILoader) m_LoaderDomain.CreateInstanceFromAndUnwrap(selfAssemblyName, "Cider_x64.Loader");
-
-            return m_Loader;
+            m_Restarter.Restart();
         }
     }
 }
