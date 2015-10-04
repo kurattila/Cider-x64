@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cider-x64", "Cider-x64.csproj", "{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cider-x64.UnitTests", "..\Cider-x64.UnitTests\Cider-x64.UnitTests.csproj", "{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cider-x64.UnitTests", "UnitTests\Cider-x64.UnitTests.csproj", "{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
