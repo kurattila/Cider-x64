@@ -1,26 +1,48 @@
 ﻿
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace Cider_x64
 {
     internal class AppRestarter
     {
+        internal interface IDispatcherAccessor
+        {
+            void BeginInvoke(Action action, DispatcherPriority priority);
+        }
+
+        DispatcherAccessor m_DispatcherAccessor = new DispatcherAccessor();
+        class DispatcherAccessor : IDispatcherAccessor
+        {
+            Control m_GuiThreadDispatcherObject;
+            public DispatcherAccessor()
+            {
+                m_GuiThreadDispatcherObject = new Control();
+            }
+            public void BeginInvoke(Action action, DispatcherPriority priority)
+            {
+                m_GuiThreadDispatcherObject.Dispatcher.BeginInvoke(action, priority);
+            }
+        }
+
         public void Restart()
         {
-            launchDelayedAction(new Action(() =>
+            // shutting down the Application object can only be done on the tread which created it
+            Action runOnGuiThread = new Action(() =>
             {
                 string currentProcessBinary = getCurrentProcessAssemblyLocation();
                 startProcess(currentProcessBinary, null);
 
                 shutdownApplication();
-            }));
+            });
+            getDispatcherAccessor().BeginInvoke(runOnGuiThread, DispatcherPriority.Normal);
         }
 
-        protected virtual void launchDelayedAction(Action action)
+        protected virtual IDispatcherAccessor getDispatcherAccessor()
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(action, DispatcherPriority.Normal, null);
+            return m_DispatcherAccessor;
         }
 
         protected virtual string getCurrentProcessAssemblyLocation()

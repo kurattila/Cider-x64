@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows;
 using System.Windows.Threading;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace Cider_x64.UnitTests
 {
@@ -33,23 +34,31 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Restart_WillDelayItsActions_Always()
+        public void Restart_WillShutdownThroughDispatcher_Always()
         {
             var restarter = new Fake_AppRestarter();
 
             restarter.Restart();
 
-            Assert.IsTrue(restarter.CalledLaunchDelayedAction);
+            Assert.IsTrue(restarter.CalledShutdownApplicationThroughBeginInvoke);
         }
     }
 
     class Fake_AppRestarter : AppRestarter
+                            , AppRestarter.IDispatcherAccessor
     {
-        public bool CalledLaunchDelayedAction = false;
-        protected override void launchDelayedAction(Action action)
+        bool m_InsideBeginInvoke;
+        public List<Delegate> BeginInvokedActions = new List<Delegate>();
+        public void BeginInvoke(Action action, DispatcherPriority priority)
         {
+            m_InsideBeginInvoke = true;
             action();
-            CalledLaunchDelayedAction = true;
+            m_InsideBeginInvoke = false;
+        }
+
+        protected override IDispatcherAccessor getDispatcherAccessor()
+        {
+            return this;
         }
 
         public string ForcedCurrentProcessAssemblyLocation;
@@ -69,9 +78,11 @@ namespace Cider_x64.UnitTests
             }
         }
 
+        public bool CalledShutdownApplicationThroughBeginInvoke = false;
         public bool CalledShutdownApplication = false;
         protected override void shutdownApplication()
         {
+            CalledShutdownApplicationThroughBeginInvoke = m_InsideBeginInvoke;
             CalledShutdownApplication = true;
         }
     }
