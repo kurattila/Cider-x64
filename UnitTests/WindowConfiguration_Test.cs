@@ -97,15 +97,15 @@ namespace Cider_x64.UnitTests
 
         public List<RegistryKeyWrapper> RegKeysSavedInto = new List<RegistryKeyWrapper>();
         public Dictionary<string, int> SettingsSaved = new Dictionary<string, int>();
-        protected override void saveSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId, int value)
+        protected override void saveSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId, object value)
         {
             RegKeysSavedInto.Add(regKeyWrapper);
-            SettingsSaved[settingId] = value;
+            SettingsSaved[settingId] = (int)value;
         }
 
         public List<RegistryKeyWrapper> RegKeysLoadedFrom = new List<RegistryKeyWrapper>();
         public Dictionary<string, int> ForcedSettingsToLoad = new Dictionary<string, int>();
-        protected override int loadSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId)
+        protected override object loadSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId, object defaultValue)
         {
             RegKeysLoadedFrom.Add(regKeyWrapper);
             return ForcedSettingsToLoad[settingId];

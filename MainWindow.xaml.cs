@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using Microsoft.Win32;
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Threading;
 
@@ -12,6 +11,7 @@ namespace Cider_x64
     /// </summary>
     public partial class MainWindow : Window
     {
+        LoaderConfiguration m_Project = new LoaderConfiguration();
         WindowConfiguration m_WindowConfig = new WindowConfiguration("MainWindow");
 
         LoaderFactory m_LoaderFactory = new LoaderFactory();
@@ -22,31 +22,14 @@ namespace Cider_x64
 
             InitializeComponent();
 
-            _assemblyPath = getAppSettingsRegistrykey().GetValue("GuiPreview-AssemblyFullPath") as string;
-            _typeName = getAppSettingsRegistrykey().GetValue("GuiPreview-Namespace.TypeName") as string;
-            if (string.IsNullOrEmpty(_assemblyPath))
-                getAppSettingsRegistrykey().SetValue("GuiPreview-AssemblyFullPath", "");
-            if (string.IsNullOrEmpty(_typeName))
-                getAppSettingsRegistrykey().SetValue("GuiPreview-Namespace.TypeName", "");
-
-            try
-            {
-                _fsWatcher = new FileSystemWatcher(Path.GetDirectoryName(_assemblyPath));
-                _fsWatcher.Changed += fsWatcher_Changed;
-                _fsWatcher.EnableRaisingEvents = true;
-            }
-            catch (System.ArgumentException)
-            {
-                // Assembly path may be wrong
-            }
-
-            this.IsVisibleChanged += MainWindow_IsVisibleChanged;
+            this.Dispatcher.BeginInvoke(
+                new Action(() => { showGuiPreview(); })
+                , DispatcherPriority.SystemIdle);
         }
 
-        string _appRegistryBranch = "Cider-x64";
-        string _appVersion = "1.0.0";
         void MainWindow_Initialized(object sender, EventArgs e)
         {
+            m_Project.LoadSettings();
             m_WindowConfig.LoadSettings();
             if (m_WindowConfig.ValidSettings())
             {
@@ -55,66 +38,65 @@ namespace Cider_x64
                 this.Width = m_WindowConfig.Width;
                 this.Height = m_WindowConfig.Height;
             }
+
+            try
+            {
+                _fsWatcher = new FileSystemWatcher(Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui));
+                _fsWatcher.Changed += fsWatcher_Changed;
+                _fsWatcher.EnableRaisingEvents = true;
+            }
+            catch (System.ArgumentException)
+            {
+                // Assembly path may be wrong
+            }
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
         {
-            m_Loader.CloseWindow();
+            try
+            {
+                m_Loader.CloseWindow();
+            }
+            catch(System.Runtime.Remoting.RemotingException)
+            {
+                // preview window might have been closed already
+            }
 
             m_WindowConfig.Left = (int)Left;
             m_WindowConfig.Top = (int)Top;
             m_WindowConfig.Width = (int)Width;
             m_WindowConfig.Height = (int)Height;
             m_WindowConfig.SaveSettings();
+
+            m_Project.SaveSettings();
         }
-
-        RegistryKey getAppSettingsRegistrykey()
-        {
-            RegistryKey key = Registry.CurrentUser.OpenSubKey("Software", true);
-            key.CreateSubKey(_appRegistryBranch);
-            key = key.OpenSubKey(_appRegistryBranch, true);
-
-            key.CreateSubKey(_appVersion);
-            key = key.OpenSubKey(_appVersion, true);
-
-            return key;
-        }
-
-        string _assemblyPath; // full path to assembly.dll
-        string _typeName; // string of "namespace.classname" of type to instantiate
 
         FileSystemWatcher _fsWatcher;
 
         ILoader m_Loader;
-        void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        void showGuiPreview()
         {
-            bool isVisible = (bool)e.NewValue;
-            if (isVisible)
+            string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
+            Directory.SetCurrentDirectory(assemblyDirectory);
+
+            m_Loader = m_LoaderFactory.Create();
+
+            // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
+            foreach (string assemblyToPreload in m_Project.PreloadedAssemblies)
             {
-                string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
-                Directory.SetCurrentDirectory(assemblyDirectory);
-
-                m_Loader = m_LoaderFactory.Create();
-
-                // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
-                string[] assembliesToPreload = getAppSettingsRegistrykey().GetValue("GuiPreview-ToPreloadAssemblies") as string[];
-                foreach (string assemblyToPreload in assembliesToPreload)
-                {
-                    m_Loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, assemblyToPreload));
-                }
-
-                // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
-                string mergedDirectoryToAdd = getAppSettingsRegistrykey().GetValue("GuiPreview-ToAddMergedDictionary") as string;
-                m_Loader.AddMergedDictionary(mergedDirectoryToAdd);
-
-                m_Loader.Show(_assemblyPath, _typeName);
+                m_Loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, assemblyToPreload));
             }
+
+            // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
+            m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
+
+            m_Loader.Show(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
         }
 
         bool _restartPending = false;
         void fsWatcher_Changed(object sender, System.IO.FileSystemEventArgs e)
         {
-            string assemblyDirectory = Path.GetDirectoryName(_assemblyPath);
+            string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
             if (Path.GetDirectoryName(e.FullPath) == assemblyDirectory)
             {
                 if (_restartPending)
