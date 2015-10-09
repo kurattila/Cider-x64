@@ -77,7 +77,8 @@ namespace Cider_x64
         void showGuiPreview()
         {
             string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
-            Directory.SetCurrentDirectory(assemblyDirectory);
+            if (!string.IsNullOrEmpty(assemblyDirectory))
+                Directory.SetCurrentDirectory(assemblyDirectory);
 
             m_Loader = m_LoaderFactory.Create();
 

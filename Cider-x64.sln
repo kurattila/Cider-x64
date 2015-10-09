@@ -7,30 +7,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cider-x64", "Cider-x64.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cider-x64.UnitTests", "UnitTests\Cider-x64.UnitTests.csproj", "{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cider-x64.SampleGuiElements", "Cider-x64.SampleGuiElements\Cider-x64.SampleGuiElements.vcxproj", "{B3BD972A-95B8-46E8-8499-2DE51BF9CE0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Debug|x64.ActiveCfg = Debug|x64
 		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Debug|x64.Build.0 = Debug|x64
-		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Release|x64.ActiveCfg = Release|x64
 		{67C2F4C9-3A3B-40A3-9BAC-EEE12C8B29F8}.Release|x64.Build.0 = Release|x64
-		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Debug|x64.ActiveCfg = Debug|x64
 		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Debug|x64.Build.0 = Debug|x64
-		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Release|x64.ActiveCfg = Release|x64
 		{BF81EEF3-80A1-43D3-A282-9D0C7CB62D7A}.Release|x64.Build.0 = Release|x64
+		{B3BD972A-95B8-46E8-8499-2DE51BF9CE0B}.Debug|x64.ActiveCfg = Debug|x64
+		{B3BD972A-95B8-46E8-8499-2DE51BF9CE0B}.Debug|x64.Build.0 = Debug|x64
+		{B3BD972A-95B8-46E8-8499-2DE51BF9CE0B}.Release|x64.ActiveCfg = Release|x64
+		{B3BD972A-95B8-46E8-8499-2DE51BF9CE0B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

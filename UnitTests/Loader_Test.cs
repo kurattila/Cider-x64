@@ -35,16 +35,20 @@ namespace Cider_x64.UnitTests
             return ForcedCreatedInstance;
         }
 
-        public List<Window> WindowsDisplayed = new List<Window>();
-        protected override void displayWpfGuiPreview(Window instanceCreated)
+        public Window WindowDisplayed;
+        public string WindowDisplayedTitleText;
+        protected override void displayWpfGuiPreview(Window instanceCreated, string windowTitle)
         {
-            WindowsDisplayed.Add(instanceCreated);
+            WindowDisplayed = instanceCreated;
+            WindowDisplayedTitleText = windowTitle;
         }
 
-        public List<UserControl> UserControlsDisplayed = new List<UserControl>();
-        protected override void displayWpfGuiPreview(UserControl instanceCreated)
+        public UserControl UserControlDisplayed;
+        public string UserControlHostingWindowTitleText;
+        protected override void displayWpfGuiPreview(UserControl instanceCreated, string windowTitle)
         {
-            UserControlsDisplayed.Add(instanceCreated);
+            UserControlDisplayed = instanceCreated;
+            UserControlHostingWindowTitleText = windowTitle;
         }
     }
 
@@ -60,7 +64,17 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void AddMergedDictionary_WillAddResDictToCollection_Always()
+        public void AddMergedDictionary_WontThrow_WhenNoResDictSpecified()
+        {
+            var loader = new Fake_Loader();
+
+            loader.AddMergedDictionary(null);
+
+            // Implicit assert -- when at this point, then AddMergedDictionary() didn't throw
+        }
+
+        [TestMethod]
+        public void AddMergedDictionary_WillAddResDictToCollection_WhenResDictSpecified()
         {
             var loader = new Fake_Loader();
 
@@ -156,8 +170,8 @@ namespace Cider_x64.UnitTests
 
             loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            Assert.AreEqual(dummyWindow, loader.WindowsDisplayed[0]);
-            Assert.AreEqual(0, loader.UserControlsDisplayed.Count);
+            Assert.AreEqual(dummyWindow, loader.WindowDisplayed);
+            Assert.IsTrue(loader.UserControlDisplayed == null);
         }
 
         [TestMethod]
@@ -168,8 +182,8 @@ namespace Cider_x64.UnitTests
 
             loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            Assert.AreEqual(0, loader.WindowsDisplayed.Count);
-            Assert.AreEqual(0, loader.UserControlsDisplayed.Count);
+            Assert.IsTrue(loader.UserControlDisplayed == null);
+            Assert.IsTrue(loader.WindowDisplayed == null);
         }
 
         [TestMethod]
@@ -181,8 +195,8 @@ namespace Cider_x64.UnitTests
 
             loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            Assert.AreEqual(dummyUserControl, loader.UserControlsDisplayed[0]);
-            Assert.AreEqual(0, loader.WindowsDisplayed.Count);
+            Assert.AreEqual(dummyUserControl, loader.UserControlDisplayed);
+            Assert.IsTrue(loader.WindowDisplayed == null);
         }
 
         [TestMethod]
@@ -193,8 +207,32 @@ namespace Cider_x64.UnitTests
 
             loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            Assert.AreEqual(0, loader.UserControlsDisplayed.Count);
-            Assert.AreEqual(0, loader.WindowsDisplayed.Count);
+            Assert.IsTrue(loader.UserControlDisplayed == null);
+            Assert.IsTrue(loader.WindowDisplayed == null);
+        }
+
+        [TestMethod]
+        public void Show_WillSetHostingWindowTitleToTypeName_WhenPreviewingUserControl()
+        {
+            var loader = new Fake_Loader();
+            var dummyUserControl = new UserControl();
+            loader.ForcedCreatedInstance = dummyUserControl;
+
+            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+
+            Assert.AreEqual("dummyNamespace.dummyType", loader.UserControlHostingWindowTitleText);
+        }
+
+        [TestMethod]
+        public void Show_WillSetWindowTitleToTypeName_WhenPreviewingWindow()
+        {
+            var loader = new Fake_Loader();
+            var dummyWindow = new Window();
+            loader.ForcedCreatedInstance = dummyWindow;
+
+            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+
+            Assert.AreEqual("dummyNamespace.dummyType", loader.WindowDisplayedTitleText);
         }
     }
 }

@@ -47,6 +47,9 @@ namespace Cider_x64
 
         public void AddMergedDictionary(string packUriStringOfResDictXaml)
         {
+            if (string.IsNullOrEmpty(packUriStringOfResDictXaml))
+                return;
+
             ResourceDictionary xamlDictionaryToMerge = new ResourceDictionary();
             xamlDictionaryToMerge.Source = new Uri(packUriStringOfResDictXaml);
 
@@ -91,10 +94,10 @@ namespace Cider_x64
             object instanceCreated = createInstanceOfType(wrapper, namespaceDotType);
 
             if (instanceCreated is Window)
-                displayWpfGuiPreview(instanceCreated as Window);
+                displayWpfGuiPreview(instanceCreated as Window, namespaceDotType);
 
             if (instanceCreated is UserControl)
-                displayWpfGuiPreview(instanceCreated as UserControl);
+                displayWpfGuiPreview(instanceCreated as UserControl, namespaceDotType);
         }
 
         public void CloseWindow()
@@ -109,14 +112,16 @@ namespace Cider_x64
             return Activator.CreateInstance(typeToCreate);
         }
 
-        virtual protected void displayWpfGuiPreview(Window instanceCreated)
+        virtual protected void displayWpfGuiPreview(Window instanceCreated, string windowTitle)
         {
+            instanceCreated.Title = windowTitle;
             instanceCreated.Show();
         }
 
-        virtual protected void displayWpfGuiPreview(UserControl instanceCreated)
+        virtual protected void displayWpfGuiPreview(UserControl instanceCreated, string windowTitle)
         {
             m_Win.Content = instanceCreated;
+            m_Win.Title = windowTitle;
             m_Win.Show();
         }
     }
