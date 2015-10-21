@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Microsoft.Win32;
 using System.IO;
 using System.Windows.Threading;
 
@@ -76,6 +75,9 @@ namespace Cider_x64
         ILoader m_Loader;
         void showGuiPreview()
         {
+            var waitIndicator = new WaitIndicator();
+            waitIndicator.BeginWaiting(Left, Top, ActualWidth, ActualHeight);
+
             string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
             if (!string.IsNullOrEmpty(assemblyDirectory))
                 Directory.SetCurrentDirectory(assemblyDirectory);
@@ -92,6 +94,8 @@ namespace Cider_x64
             m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
 
             m_Loader.Show(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
+
+            waitIndicator.EndWaiting();
         }
 
         bool _restartPending = false;
