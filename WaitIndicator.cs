@@ -7,7 +7,7 @@ namespace Cider_x64
     /// <summary>
     /// Inspired by https://strukachev.wordpress.com/2011/01/09/wpf-progress-window-in-separate-thread/
     /// </summary>
-    internal class WaitIndicator
+    internal class WaitIndicator : IDisposable
     {
         private Thread m_BackgroundGuiThread;
         private AutoResetEvent m_WaitWindowShownEvent = new AutoResetEvent(false);
@@ -72,42 +72,41 @@ namespace Cider_x64
             return new WaitWindow();
         }
 
-        internal interface IWindow
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
-            void Show(double left, double top, double width, double height);
-            void Close(AutoResetEvent waitWindowClosedEvent);
-            Dispatcher DispatcherInstance { get; }
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // dispose managed state (managed objects).
+                    m_WaitWindowShownEvent.Dispose();
+                    m_WaitWindowClosedEvent.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
 
-        internal class WaitWindow : System.Windows.Window, IWindow
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~WaitIndicator() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
         {
-            public WaitWindow()
-            {
-                this.Topmost = true;
-                this.WindowStyle = System.Windows.WindowStyle.None;
-                this.ResizeMode = System.Windows.ResizeMode.NoResize;
-                this.Content = new System.Windows.Controls.ProgressBar() { IsIndeterminate = true };
-            }
-
-            public void Close(AutoResetEvent waitWindowClosedEvent)
-            {
-                base.Close();
-                waitWindowClosedEvent.Set();
-            }
-
-            public void Show(double left, double top, double width, double height)
-            {
-                this.Left = left;
-                this.Top = top;
-                this.Width = width;
-                this.Height = height;
-                Show();
-            }
-
-            public Dispatcher DispatcherInstance
-            {
-                get { return this.Dispatcher; }
-            }
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

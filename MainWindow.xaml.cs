@@ -8,7 +8,8 @@ namespace Cider_x64
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public sealed partial class MainWindow : Window
+                                           , IDisposable
     {
         LoaderConfiguration m_Project = new LoaderConfiguration();
         WindowConfiguration m_WindowConfig = new WindowConfiguration("MainWindow");
@@ -115,9 +116,14 @@ namespace Cider_x64
         }
 
         AppRestarter m_Restarter = new AppRestarter();
-        virtual protected void requestAppRestart(object sender, RoutedEventArgs e)
+        void requestAppRestart(object sender, RoutedEventArgs e)
         {
             m_Restarter.Restart();
+        }
+
+        public void Dispose()
+        {
+            _fsWatcher.Dispose();
         }
     }
 }

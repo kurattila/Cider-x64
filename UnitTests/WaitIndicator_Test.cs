@@ -77,7 +77,7 @@ namespace Cider_x64.UnitTests
         }
     }
 
-    class Fake_WaitWindow : WaitIndicator.IWindow
+    class Fake_WaitWindow : IWindow
     {
         public bool CalledClose { get; private set; }
         public int CalledCloseThreadId { get; private set; }
