@@ -8,9 +8,8 @@ using System.Windows.Controls;
 
 namespace Cider_x64
 {
-    public class Loader : MarshalByRefObject, ILoader
+    internal class Loader : MarshalByRefObject, ILoader
     {
-        Window m_Win = new Window() { Topmost = true };
         WindowConfiguration m_WindowConfig = new WindowConfiguration("PreviewWindow");
 
         static Loader()
@@ -20,28 +19,31 @@ namespace Cider_x64
 
         public Loader()
         {
-            m_Win.Initialized += onPreviewWindowInitialized;
-            m_Win.Closed += onPreviewWindowClosed;
         }
 
-        private void onPreviewWindowInitialized(object sender, EventArgs e)
+        private void onSourceInitialized(object sender, EventArgs e)
         {
             m_WindowConfig.LoadSettings();
             if (m_WindowConfig.ValidSettings())
             {
-                m_Win.Left = m_WindowConfig.Left;
-                m_Win.Top = m_WindowConfig.Top;
-                m_Win.Width = m_WindowConfig.Width;
-                m_Win.Height = m_WindowConfig.Height;
+                Window previewWindow = sender as Window;
+                previewWindow.Topmost = true;
+
+                previewWindow.Left = m_WindowConfig.Left;
+                previewWindow.Top = m_WindowConfig.Top;
+                previewWindow.Width = m_WindowConfig.Width;
+                previewWindow.Height = m_WindowConfig.Height;
             }
         }
 
         private void onPreviewWindowClosed(object sender, EventArgs e)
         {
-            m_WindowConfig.Left = (int)m_Win.Left;
-            m_WindowConfig.Top = (int)m_Win.Top;
-            m_WindowConfig.Width = (int)m_Win.Width;
-            m_WindowConfig.Height = (int)m_Win.Height;
+            Window previewWindow = sender as Window;
+
+            m_WindowConfig.Left = (int)previewWindow.Left;
+            m_WindowConfig.Top = (int)previewWindow.Top;
+            m_WindowConfig.Width = (int)previewWindow.Width;
+            m_WindowConfig.Height = (int)previewWindow.Height;
             m_WindowConfig.SaveSettings();
         }
 
@@ -76,7 +78,10 @@ namespace Cider_x64
             loadAssembly(assemblyPath);
         }
 
-        public void Show(string assemblyPath, string namespaceDotType)
+        protected IGuiPreviewer m_GuiPreviewer;
+        object m_InstanceCreated;
+        string m_NamespaceDotTypeCreated;
+        public virtual void Load(string assemblyPath, string namespaceDotType)
         {
             if (string.IsNullOrEmpty(assemblyPath) || string.IsNullOrEmpty(namespaceDotType))
                 return; // settings uninitialized
@@ -91,38 +96,35 @@ namespace Cider_x64
                 return; // wrong assembly path specified
             }
 
-            object instanceCreated = createInstanceOfType(wrapper, namespaceDotType);
+            m_InstanceCreated = createInstanceOfType(wrapper, namespaceDotType);
+            m_NamespaceDotTypeCreated = namespaceDotType;
 
-            if (instanceCreated is Window)
-                displayWpfGuiPreview(instanceCreated as Window, namespaceDotType);
+            m_GuiPreviewer = GuiPreviewerFactory.Create(m_InstanceCreated);
+            m_GuiPreviewer.PreviewerWindow.Title = m_NamespaceDotTypeCreated;
+            m_GuiPreviewer.PreviewerWindow.SourceInitialized += onSourceInitialized;
+            m_GuiPreviewer.PreviewerWindow.Closed += onPreviewWindowClosed;
+        }
 
-            if (instanceCreated is UserControl)
-                displayWpfGuiPreview(instanceCreated as UserControl, namespaceDotType);
+        public virtual void Hide()
+        {
+            m_GuiPreviewer.PreviewerWindow.Hide();
+        }
+
+        public virtual void Show()
+        {
+            m_GuiPreviewer.PreviewerWindow.Show();
         }
 
         public void CloseWindow()
         {
-            if (m_Win.IsVisible)
-                m_Win.Close();
+            if (m_GuiPreviewer.PreviewerWindow.IsVisible)
+                m_GuiPreviewer.PreviewerWindow.Close();
         }
 
         virtual protected object createInstanceOfType(AssemblyWrapper assemblyOfType, string namespaceDotType)
         {
             Type typeToCreate = assemblyOfType.Assembly.GetType(namespaceDotType);
             return Activator.CreateInstance(typeToCreate);
-        }
-
-        virtual protected void displayWpfGuiPreview(Window instanceCreated, string windowTitle)
-        {
-            instanceCreated.Title = windowTitle;
-            instanceCreated.Show();
-        }
-
-        virtual protected void displayWpfGuiPreview(UserControl instanceCreated, string windowTitle)
-        {
-            m_Win.Content = instanceCreated;
-            m_Win.Title = windowTitle;
-            m_Win.Show();
         }
     }
 

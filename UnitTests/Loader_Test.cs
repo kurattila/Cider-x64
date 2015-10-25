@@ -35,26 +35,32 @@ namespace Cider_x64.UnitTests
             return ForcedCreatedInstance;
         }
 
-        public Window WindowDisplayed;
-        public string WindowDisplayedTitleText;
-        protected override void displayWpfGuiPreview(Window instanceCreated, string windowTitle)
+        public string WindowDisplayedTitleText
         {
-            WindowDisplayed = instanceCreated;
-            WindowDisplayedTitleText = windowTitle;
+            get
+            {
+                return m_GuiPreviewer.PreviewerWindow.Title;
+            }
         }
 
-        public UserControl UserControlDisplayed;
-        public string UserControlHostingWindowTitleText;
-        protected override void displayWpfGuiPreview(UserControl instanceCreated, string windowTitle)
+        public Window WindowDisplayed;
+        public override void Show()
         {
-            UserControlDisplayed = instanceCreated;
-            UserControlHostingWindowTitleText = windowTitle;
+            WindowDisplayed = m_GuiPreviewer.PreviewerWindow;
         }
     }
 
     [TestClass]
     public class Loader_Test
     {
+        public Loader_Test()
+        {
+            // Workaround needed to be able to use "pack://application..." syntax in unit tests
+            // http://stackoverflow.com/questions/6005398/uriformatexception-invalid-uri-invalid-port-specified
+            if (Application.Current == null)
+                new Application();
+        }
+
         [TestMethod]
         public void StaticConstructor_WillSetDesignModeForAppDomain_Always()
         {
@@ -107,56 +113,58 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Show_WillLoadAssemblyBeforeShowing_Always()
+        public void Load_WillLoadAssembly_Always()
         {
             var loader = new Fake_Loader();
+            loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
 
-            loader.Show(assemblyPath, "Namespace.Type");
+            loader.Load(assemblyPath, "Namespace.Type");
 
             Assert.AreEqual(assemblyPath, loader.LoadedAssemblies[0].Path);
         }
 
         [TestMethod]
-        public void Show_WillCreateInstanceOfType_Always()
+        public void Load_WillCreateInstanceOfType_Always()
         {
             var loader = new Fake_Loader();
+            loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
 
-            loader.Show(assemblyPath, "dummyNamespace.dummyType");
+            loader.Load(assemblyPath, "dummyNamespace.dummyType");
 
             Assert.AreEqual(assemblyPath, loader.AssembliesRequestedToCreateFrom[0].Path);
             Assert.IsTrue(loader.TypesRequestedToCreate.Contains("dummyNamespace.dummyType"));
         }
 
         [TestMethod]
-        public void Show_WillHandleFileException_WhenAssemblyNotFound()
+        public void Load_WillHandleFileException_WhenAssemblyNotFound()
         {
             var loader = new Fake_Loader();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
 
             loader.ForceAssemblyNotFound = true;
-            loader.Show(assemblyPath, "dummyNamespace.dummyType");
+            loader.Load(assemblyPath, "dummyNamespace.dummyType");
 
             // Implicit assert: exception thrown by Show() would make this test fail
         }
 
         [TestMethod]
-        public void Show_WillQuitImmediately_WhenAssemblyPathEmpty()
+        public void Load_WillQuitImmediately_WhenAssemblyPathEmpty()
         {
             var loader = new Fake_Loader();
 
-            loader.Show("", "dummyNamespace.dummyType");
+            loader.Load("", "dummyNamespace.dummyType");
 
             Assert.AreEqual(0, loader.LoadedAssemblies.Count);
         }
 
         [TestMethod]
-        public void Show_WillQuitImmediately_WhenTypeToCreateIsEmpty()
+        public void Load_WillQuitImmediately_WhenTypeToCreateIsEmpty()
         {
             var loader = new Fake_Loader();
 
-            loader.Show("dummyAssembly.dll", "");
+            loader.Load("dummyAssembly.dll", "");
 
             Assert.AreEqual(0, loader.LoadedAssemblies.Count);
         }
@@ -167,23 +175,11 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.Show();
 
             Assert.AreEqual(dummyWindow, loader.WindowDisplayed);
-            Assert.IsTrue(loader.UserControlDisplayed == null);
-        }
-
-        [TestMethod]
-        public void Show_WontDisplayWindow_WhenNonWindowTypeInstantiated()
-        {
-            var loader = new Fake_Loader();
-            loader.ForcedCreatedInstance = new object();
-
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
-
-            Assert.IsTrue(loader.UserControlDisplayed == null);
-            Assert.IsTrue(loader.WindowDisplayed == null);
         }
 
         [TestMethod]
@@ -192,23 +188,11 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.Show();
 
-            Assert.AreEqual(dummyUserControl, loader.UserControlDisplayed);
-            Assert.IsTrue(loader.WindowDisplayed == null);
-        }
-
-        [TestMethod]
-        public void Show_WontDisplayUserControl_WhenNonUserControlTypeInstantiated()
-        {
-            var loader = new Fake_Loader();
-            loader.ForcedCreatedInstance = new object();
-
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
-
-            Assert.IsTrue(loader.UserControlDisplayed == null);
-            Assert.IsTrue(loader.WindowDisplayed == null);
+            Assert.AreEqual(dummyUserControl, loader.WindowDisplayed.Content);
         }
 
         [TestMethod]
@@ -217,10 +201,11 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.Show();
 
-            Assert.AreEqual("dummyNamespace.dummyType", loader.UserControlHostingWindowTitleText);
+            Assert.AreEqual("dummyNamespace.dummyType", loader.WindowDisplayed.Title);
         }
 
         [TestMethod]
@@ -229,10 +214,20 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
-            loader.Show("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.Show();
 
             Assert.AreEqual("dummyNamespace.dummyType", loader.WindowDisplayedTitleText);
+        }
+
+        [TestMethod]
+        public void Load_WillCreatePreviewWindow_Always()
+        {
+            var loader = new Fake_Loader();
+            var dummyWindow = new Window();
+            loader.ForcedCreatedInstance = dummyWindow;
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
         }
     }
 }

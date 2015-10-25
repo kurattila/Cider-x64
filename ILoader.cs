@@ -4,7 +4,9 @@
     {
         void PreloadAssembly(string assemblyPath);
         void AddMergedDictionary(string packUriStringOfResDictXaml);
-        void Show(string assemblyPath, string namespaceDotType);
+        void Load(string assemblyPath, string namespaceDotType);
+        void Show();
+        void Hide();
         void CloseWindow();
     }
 }

@@ -7,7 +7,7 @@
         xmlns:helpers="clr-namespace:Cider_x64.Helpers"
         mc:Ignorable="d"
         x:Name="waitWindow"
-        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Cursor="AppStarting" Topmost="True" Background="Transparent"
+        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Cursor="AppStarting" Topmost="True" ShowInTaskbar="False" Background="Transparent"
         helpers:VisualStateManager_Accessor.VisualStateName="{Binding WaitWindowVisualState}"
         Title="WaitWindow" Height="300" Width="300">
     <Window.Resources>

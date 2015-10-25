@@ -19,12 +19,24 @@ namespace Cider_x64
         {
             Initialized += MainWindow_Initialized;
             Closed += MainWindow_Closed;
+            StateChanged += MainWindow_StateChanged;
 
             InitializeComponent();
 
             this.Dispatcher.BeginInvoke(
                 new Action(() => { showGuiPreview(); })
                 , DispatcherPriority.SystemIdle);
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (m_Loader != null)
+            {
+                if (WindowState == WindowState.Minimized)
+                    m_Loader.Hide();
+                else
+                    m_Loader.Show();
+            }
         }
 
         void MainWindow_Initialized(object sender, EventArgs e)
@@ -94,7 +106,8 @@ namespace Cider_x64
             // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
             m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
 
-            m_Loader.Show(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
+            m_Loader.Load(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
+            m_Loader.Show();
 
             waitIndicator.EndWaiting();
         }
