@@ -55,10 +55,6 @@ namespace Cider_x64.UnitTests
     {
         public Loader_Test()
         {
-            // Workaround needed to be able to use "pack://application..." syntax in unit tests
-            // http://stackoverflow.com/questions/6005398/uriformatexception-invalid-uri-invalid-port-specified
-            if (Application.Current == null)
-                new Application();
         }
 
         [TestMethod]

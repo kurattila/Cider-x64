@@ -19,6 +19,35 @@ namespace Cider_x64
 
         public Loader()
         {
+            // Workaround needed to be able to use "pack://application..." syntax.
+            // http://stackoverflow.com/questions/6005398/uriformatexception-invalid-uri-invalid-port-specified
+            // The protocol "pack://" won't be recognized before it is registered and its registration can be forced
+            // by force-creating an Application object (if none exists yet)
+            if (Application.Current == null)
+                new Application();
+        }
+
+        /// <summary>
+        /// Obtains a lifetime service object to control the lifetime policy for this instance.
+        /// 
+        /// Prevent exceptions of "Object 'XXX.rem' has been disconnected or does not exist at the server" happening
+        /// because of an expired lease of a remoting object.
+        /// </summary>
+        /// <returns></returns>
+        public override object InitializeLifetimeService()
+        {
+            // From "Remoting: Managing the Lifetime of Remote .NET Objects with Leasing and Sponsorship"
+            // in MSDN Magazine December 2003:
+            // 
+            // The singleton design pattern semantics mandate that the singleton object lives forever
+            // once it is created. This can't happen if its default lease time is five minutes.
+            // If no client accesses a singleton object for more than five minutes after it is created,
+            // the .NET Remoting Framework will deactivate the singleton. Future calls from the clients
+            // will be silently routed to a new singleton object in violation of the pattern's semantics.
+            // Fortunately, infinite lease time is supported. When you design a singleton object,
+            // override InitializeLifetimeService and return a null object as the new lease,
+            // indicating that this lease never expires
+            return null;
         }
 
         private void onSourceInitialized(object sender, EventArgs e)
@@ -61,8 +90,6 @@ namespace Cider_x64
 
         virtual protected Collection<ResourceDictionary> getResourceDictionariesCollection()
         {
-            if (Application.Current == null)
-                new Application();
             return Application.Current.Resources.MergedDictionaries;
         }
 
