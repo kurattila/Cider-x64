@@ -2,6 +2,8 @@
 using System.Windows;
 using System.IO;
 using System.Windows.Threading;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace Cider_x64
 {
@@ -20,6 +22,9 @@ namespace Cider_x64
             Initialized += MainWindow_Initialized;
             Closed += MainWindow_Closed;
             StateChanged += MainWindow_StateChanged;
+
+            this.DataContextChanged += new DependencyPropertyChangedEventHandler(MainViewDataContextChanged);
+            this.DataContext = new MainViewModel();
 
             InitializeComponent();
 
@@ -61,6 +66,8 @@ namespace Cider_x64
             {
                 // Assembly path may be wrong
             }
+
+            InitializeViewModel();
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
@@ -107,6 +114,10 @@ namespace Cider_x64
             m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
 
             m_Loader.Load(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
+
+            var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
+            viewModel.ListOfSelectedAssemblyTypes = new ObservableCollection<string>(asmTypes);
+            
             m_Loader.Show();
 
             waitIndicator.EndWaiting();
@@ -137,6 +148,86 @@ namespace Cider_x64
         public void Dispose()
         {
             _fsWatcher.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        MainViewModel viewModel
+        {
+            get
+            {
+                Debug.Assert(this.DataContext as MainViewModel != null);
+                return this.DataContext as MainViewModel;
+            }
+        }
+
+        /// <summary>
+        /// DataContextChanged event handler
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">event args</param>
+        void MainViewDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            MainViewModel vm = this.DataContext as MainViewModel;
+            if (vm != null)
+            {
+                vm.ChangeAssemblyCommand = new WpfGuiHelpers.RelayCommand((param) => ChangeAssembly());
+                vm.ChangedTypeCommand = new WpfGuiHelpers.RelayCommand((param) => ChangeType(param));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void InitializeViewModel()
+        {
+            if (m_Project.ValidSettings())
+            {
+                viewModel.SelectedAssembly = m_Project.AssemblyOfPreviewedGui;
+                viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ChangeAssembly()
+        {
+            // Create an instance of the open file dialog box.
+            Microsoft.Win32.OpenFileDialog fileDialog = new Microsoft.Win32.OpenFileDialog();
+
+            // Set filter options and filter index.
+            fileDialog.Filter = "Dll Files (.dll)|*.dll|All Files (*.*)|*.*";
+            fileDialog.FilterIndex = 1;
+
+            fileDialog.Multiselect = false;
+
+            // Call the ShowDialog method to show the dialog box.
+            bool? userClickedOK = fileDialog.ShowDialog();
+
+            // Process input if the user clicked OK.
+            if (userClickedOK == true)
+            {
+                viewModel.SelectedAssembly = fileDialog.FileName;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        private void ChangeType(object type)
+        {
+            if (type is String)
+            {
+                Debug.WriteLine(type as String);
+                
+                m_Project.TypeOfPreviewedGui = type as String;
+                viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
+
+                m_Restarter.Restart();
+            }
         }
     }
 }
