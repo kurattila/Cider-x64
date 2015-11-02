@@ -57,8 +57,18 @@
     <Compile Include="AppRestarter.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="GuiPreviewer.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\BehaviorBinding.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\CommandBehavior.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\CommandBehaviorBinding.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\CommandBehaviorCollection.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\EventHandlerGenerator.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\ExecutionStrategy.cs" />
+    <Compile Include="Helpers\AttachedCommandBehavior\SimpleCommand.cs" />
     <Compile Include="IWindow.cs" />
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\ObservableBase.cs" />
+    <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="WaitIndicator.cs" />
     <Compile Include="WaitWindow.xaml.cs">
       <DependentUpon>WaitWindow.xaml</DependentUpon>

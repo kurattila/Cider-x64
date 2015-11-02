@@ -8,5 +8,11 @@
         void Show();
         void Hide();
         void CloseWindow();
+
+        /// <summary>
+        /// Get list of loaded assembly type names. Assembly must be already loaded to obtain valid list.
+        /// </summary>
+        /// <returns>list of loaded assembly type names</returns>
+        System.Collections.Generic.List<System.String> GetLoadedAssemblyTypeNames();
     }
 }

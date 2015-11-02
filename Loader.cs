@@ -123,6 +123,8 @@ namespace Cider_x64
                 return; // wrong assembly path specified
             }
 
+            m_LoadedAssemblyTypes = getValidAssemblyTypeNames(wrapper.Assembly.GetTypes());
+
             m_InstanceCreated = createInstanceOfType(wrapper, namespaceDotType);
             m_NamespaceDotTypeCreated = namespaceDotType;
 
@@ -152,6 +154,27 @@ namespace Cider_x64
         {
             Type typeToCreate = assemblyOfType.Assembly.GetType(namespaceDotType);
             return Activator.CreateInstance(typeToCreate);
+        }
+
+
+        private System.Collections.Generic.List<System.String> m_LoadedAssemblyTypes;
+
+        virtual public System.Collections.Generic.List<System.String> GetLoadedAssemblyTypeNames()
+        {
+            return m_LoadedAssemblyTypes;
+        }
+
+        virtual public System.Collections.Generic.List<System.String> getValidAssemblyTypeNames(Type[] assemblyTypes)
+        {
+            var list = new System.Collections.Generic.List<System.String>();
+
+            foreach (Type type in assemblyTypes)
+            {
+                if (!String.IsNullOrEmpty(type.FullName) && type.IsClass)
+                    list.Add(type.FullName);
+            }
+
+            return list;
         }
     }
 
