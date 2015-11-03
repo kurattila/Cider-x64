@@ -8,14 +8,11 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 using System.Reflection;
 using System.Windows;
 
-namespace AttachedCommandBehavior
+namespace Cider_x64.Helpers.AttachedCommandBehavior
 {
     /// <summary>
     /// Defines the command behavior binding

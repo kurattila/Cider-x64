@@ -48,6 +48,12 @@ namespace Cider_x64.UnitTests
         {
             WindowDisplayed = m_GuiPreviewer.PreviewerWindow;
         }
+
+        public List<string> ForcedGetValidAssemblyTypes = new List<string>();
+        protected override List<string> getValidAssemblyTypeNames(AssemblyWrapper assemblyWrapper)
+        {
+            return ForcedGetValidAssemblyTypes;
+        }
     }
 
     [TestClass]

@@ -8,14 +8,10 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Markup;
 using System.Windows;
 using System.Windows.Input;
 
-namespace AttachedCommandBehavior
+namespace Cider_x64.Helpers.AttachedCommandBehavior
 {
     /// <summary>
     /// Interface for generic filtering of events according to their EventArgs

@@ -8,13 +8,10 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection.Emit;
 using System.Reflection;
 
-namespace AttachedCommandBehavior
+namespace Cider_x64.Helpers.AttachedCommandBehavior
 {
     /// <summary>
     /// Generates delegates according to the specified signature on runtime

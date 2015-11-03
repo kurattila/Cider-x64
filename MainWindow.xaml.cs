@@ -172,8 +172,8 @@ namespace Cider_x64
             MainViewModel vm = this.DataContext as MainViewModel;
             if (vm != null)
             {
-                vm.ChangeAssemblyCommand = new WpfGuiHelpers.RelayCommand((param) => ChangeAssembly());
-                vm.ChangedTypeCommand = new WpfGuiHelpers.RelayCommand((param) => ChangeType(param));
+                vm.ChangeAssemblyCommand = new Helpers.RelayCommand((param) => ChangeAssembly());
+                vm.ChangedTypeCommand = new Helpers.RelayCommand((param) => ChangeType(param));
             }
         }
 

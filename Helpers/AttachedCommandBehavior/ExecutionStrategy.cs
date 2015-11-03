@@ -7,11 +7,8 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace AttachedCommandBehavior
+namespace Cider_x64.Helpers.AttachedCommandBehavior
 {
     /// <summary>
     /// Defines the interface for a strategy of execution for the CommandBehaviorBinding
