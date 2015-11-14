@@ -49,10 +49,14 @@ namespace Cider_x64.UnitTests
             WindowDisplayed = m_GuiPreviewer.PreviewerWindow;
         }
 
-        public List<string> ForcedGetValidAssemblyTypes = new List<string>();
-        protected override List<string> getValidAssemblyTypeNames(AssemblyWrapper assemblyWrapper)
+        public void SetAlternativeGuiTypesExtractor(GuiTypesExtractor alternativeExtractor)
         {
-            return ForcedGetValidAssemblyTypes;
+            TypesExtractor = alternativeExtractor;
+        }
+
+        public IGuiPreviewer GetGuiPreviewer()
+        {
+            return m_GuiPreviewer;
         }
     }
 
@@ -120,6 +124,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
 
             loader.Load(assemblyPath, "Namespace.Type");
 
@@ -132,6 +137,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
 
             loader.Load(assemblyPath, "dummyNamespace.dummyType");
 
@@ -177,6 +183,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
             loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
             loader.Show();
@@ -190,6 +197,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
             loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
             loader.Show();
@@ -203,6 +211,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
             loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
             loader.Show();
@@ -216,6 +225,7 @@ namespace Cider_x64.UnitTests
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
             loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
 
             loader.Show();
@@ -224,12 +234,42 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Load_WillCreatePreviewWindow_Always()
+        public void Load_WillCreateGuiPreviewer_Always()
         {
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+
             loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+
+            Assert.IsNotNull(loader.GetGuiPreviewer());
+        }
+
+        [TestMethod]
+        public void GetLoadedAssemblyTypeNames_ReturnsTypesFromGuiTypesExtractor_Always()
+        {
+            var stubGuiTypesExtractor = new Fake_GuiTypesExtractor();
+            stubGuiTypesExtractor.ForcedExtractedGuiTypes.Add(typeof(UserControl));
+            stubGuiTypesExtractor.ForcedExtractedGuiTypes.Add(typeof(Window));
+            var loader = new Fake_Loader();
+            var dummyWindow = new Window();
+            loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(stubGuiTypesExtractor);
+            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+
+            var guiTypeNames = loader.GetLoadedAssemblyTypeNames();
+
+            Assert.AreEqual(2, guiTypeNames.Count);
+        }
+
+        class Fake_GuiTypesExtractor : GuiTypesExtractor
+        {
+            public List<Type> ForcedExtractedGuiTypes = new List<Type>();
+            public override List<Type> GetGuiTypesOnly(AssemblyWrapper assemblyWrapper)
+            {
+                return ForcedExtractedGuiTypes;
+            }
         }
     }
 }

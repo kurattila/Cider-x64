@@ -22,6 +22,13 @@ namespace Cider_x64
             //VisualStateManager.GoToState(this.waitWindow, "Inactive", false);
             background.Opacity = 0;
             progressCircle.Opacity = 0;
+
+            Closed += WaitWindow_Closed;
+        }
+
+        private void WaitWindow_Closed(object sender, EventArgs e)
+        {
+            m_WaitWindowClosedEvent.Set();
         }
 
         public Dispatcher DispatcherInstance
@@ -49,7 +56,6 @@ namespace Cider_x64
         private void onCloseTimerTick(object sender, EventArgs e)
         {
             base.Close();
-            m_WaitWindowClosedEvent.Set();
         }
 
         public void Show(double left, double top, double width, double height)

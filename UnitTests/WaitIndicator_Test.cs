@@ -14,6 +14,7 @@ namespace Cider_x64.UnitTests
             waitIndicator.BeginWaiting(0, 0, 0, 0);
 
             Assert.IsTrue(waitIndicator.CreatedWindow.CalledShow);
+            waitIndicator.EndWaiting();
         }
 
         [TestMethod]
@@ -26,6 +27,7 @@ namespace Cider_x64.UnitTests
 
             Assert.AreEqual(ApartmentState.STA, waitIndicator.CreatedWindow.CalledShowApartmentState);
             Assert.AreNotEqual(callerThreadId, waitIndicator.CreatedWindow.CalledShowThreadId);
+            waitIndicator.EndWaiting();
         }
 
         [TestMethod]
@@ -39,6 +41,7 @@ namespace Cider_x64.UnitTests
             Assert.AreEqual(20, waitIndicator.CreatedWindow.CalledShowTop);
             Assert.AreEqual(30, waitIndicator.CreatedWindow.CalledShowWidth);
             Assert.AreEqual(40, waitIndicator.CreatedWindow.CalledShowHeight);
+            waitIndicator.EndWaiting();
         }
 
         [TestMethod]

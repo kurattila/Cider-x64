@@ -63,6 +63,7 @@
     <Compile Include="AppRestarter_Test.cs" />
     <Compile Include="LoaderConfiguration_Test.cs" />
     <Compile Include="GuiPreviewer_Test.cs" />
+    <Compile Include="GuiTypesExtractor_Test.cs" />
     <Compile Include="WaitIndicator_Test.cs" />
     <Compile Include="WindowConfiguration_Test.cs" />
   </ItemGroup>

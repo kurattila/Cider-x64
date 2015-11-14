@@ -56,7 +56,7 @@ namespace Cider_x64
             if (m_WindowConfig.ValidSettings())
             {
                 Window previewWindow = sender as Window;
-                previewWindow.Topmost = true;
+//                 previewWindow.Topmost = true;
 
                 previewWindow.Left = m_WindowConfig.Left;
                 previewWindow.Top = m_WindowConfig.Top;
@@ -164,12 +164,14 @@ namespace Cider_x64
             return m_LoadedAssemblyTypes;
         }
 
+        protected GuiTypesExtractor TypesExtractor = new GuiTypesExtractor();
+
         virtual protected System.Collections.Generic.List<string> getValidAssemblyTypeNames(AssemblyWrapper assemblyWrapper)
         {
-            Type[] assemblyTypes = assemblyWrapper.Assembly.GetTypes();
+            var assemblyGuiTypes = TypesExtractor.GetGuiTypesOnly(assemblyWrapper);
             var list = new System.Collections.Generic.List<string>();
 
-            foreach (Type type in assemblyTypes)
+            foreach (Type type in assemblyGuiTypes)
             {
                 if (!String.IsNullOrEmpty(type.FullName) && type.IsClass)
                     list.Add(type.FullName);

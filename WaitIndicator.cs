@@ -34,15 +34,26 @@ namespace Cider_x64
 
         public void EndWaiting()
         {
+            // Request the WaitWindow to close (will include a fade-out animation while closing, so it'll take some time)
             m_WaitWindow.DispatcherInstance.BeginInvoke(new Action(() =>
             {
                 m_WaitWindow.Close(m_WaitWindowClosedEvent);
             })
             , DispatcherPriority.Normal);
-
+            // Wait for that window to close correctly
             m_WaitWindowClosedEvent.WaitOne();
-            //m_BackgroundGuiThread.Join();
-            m_BackgroundGuiThread.Abort();
+
+
+
+            // Request Dispatcher to stop its modal frame => thus the background thread will end correctly
+            m_WaitWindow.DispatcherInstance.BeginInvoke(new Action(() =>
+            {
+                requestEndBackgroundThread();
+            })
+            , DispatcherPriority.Normal);
+            // Wait for background thread to end correctly => no need to Abort() which is not recommended anyway
+            m_BackgroundGuiThread.Join();
+//             m_BackgroundGuiThread.Abort();
         }
 
         protected bool IsBackgroundGuiThreadRunning()
@@ -57,9 +68,15 @@ namespace Cider_x64
             m_WaitWindowShownEvent.Set();
 
             Dispatcher dispatcher = m_WaitWindow.DispatcherInstance;
-            DispatcherFrame frame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(exitFrame), frame);
-            Dispatcher.PushFrame(frame);
+            m_ModalDispatcherFrame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(exitFrame), m_ModalDispatcherFrame);
+            Dispatcher.PushFrame(m_ModalDispatcherFrame);
+        }
+
+        DispatcherFrame m_ModalDispatcherFrame;
+        void requestEndBackgroundThread()
+        {
+            m_ModalDispatcherFrame.Continue = false;
         }
 
         object exitFrame(object frame)
