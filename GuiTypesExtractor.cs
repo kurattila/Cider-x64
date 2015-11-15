@@ -34,6 +34,7 @@ namespace Cider_x64
 
     static class InheritanceDetector
     {
+        // http://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
         public static bool InheritsFrom(this Type type, Type baseType)
         {
             // null does not have base type

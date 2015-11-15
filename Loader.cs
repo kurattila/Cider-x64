@@ -24,7 +24,17 @@ namespace Cider_x64
             // The protocol "pack://" won't be recognized before it is registered and its registration can be forced
             // by force-creating an Application object (if none exists yet)
             if (Application.Current == null)
-                new Application();
+            {
+                new Application()
+                {
+                    ShutdownMode = ShutdownMode.OnExplicitShutdown // Switching to previewing of a different GUI type will close
+                                                                   // the then current GuiPreview Window first and will immediately
+                                                                   // open a new GuiPreview Window. However, closing the 1st one
+                                                                   // would be seen as closing the AppDomain's last Window by WPF,
+                                                                   // thus WPF would issue an Application.Shutdown() call.
+                                                                   // We're going to prevent that.
+                };
+            }
         }
 
         /// <summary>
@@ -108,24 +118,30 @@ namespace Cider_x64
         protected IGuiPreviewer m_GuiPreviewer;
         object m_InstanceCreated;
         string m_NamespaceDotTypeCreated;
-        public virtual void Load(string assemblyPath, string namespaceDotType)
+        AssemblyWrapper m_AssemblyWrapper;
+        public virtual void LoadAssembly(string assemblyPath)
         {
-            if (string.IsNullOrEmpty(assemblyPath) || string.IsNullOrEmpty(namespaceDotType))
+            if (string.IsNullOrEmpty(assemblyPath))
                 return; // settings uninitialized
 
-            AssemblyWrapper wrapper;
             try
             {
-                wrapper = loadAssembly(assemblyPath);
+                m_AssemblyWrapper = loadAssembly(assemblyPath);
             }
             catch(FileNotFoundException)
             {
                 return; // wrong assembly path specified
             }
 
-            m_LoadedAssemblyTypes = getValidAssemblyTypeNames(wrapper);
+            m_LoadedAssemblyTypes = getValidAssemblyTypeNames(m_AssemblyWrapper);
+        }
 
-            m_InstanceCreated = createInstanceOfType(wrapper, namespaceDotType);
+        public virtual void LoadType(string namespaceDotType)
+        {
+            if (string.IsNullOrEmpty(namespaceDotType))
+                return; // settings uninitialized
+
+            m_InstanceCreated = createInstanceOfType(m_AssemblyWrapper, namespaceDotType);
             m_NamespaceDotTypeCreated = namespaceDotType;
 
             m_GuiPreviewer = GuiPreviewerFactory.Create(m_InstanceCreated);

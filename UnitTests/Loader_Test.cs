@@ -119,62 +119,65 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Load_WillLoadAssembly_Always()
+        public void LoadAssembly_WillLoadAssembly_Always()
         {
             var loader = new Fake_Loader();
             loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
 
-            loader.Load(assemblyPath, "Namespace.Type");
+            loader.LoadAssembly(assemblyPath);
 
             Assert.AreEqual(assemblyPath, loader.LoadedAssemblies[0].Path);
         }
 
         [TestMethod]
-        public void Load_WillCreateInstanceOfType_Always()
+        public void LoadType_WillCreateInstanceOfType_Always()
         {
             var loader = new Fake_Loader();
             loader.ForcedCreatedInstance = new UserControl();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
-
-            loader.Load(assemblyPath, "dummyNamespace.dummyType");
+            loader.LoadAssembly(assemblyPath);
+            
+            loader.LoadType("dummyNamespace.dummyType");
 
             Assert.AreEqual(assemblyPath, loader.AssembliesRequestedToCreateFrom[0].Path);
             Assert.IsTrue(loader.TypesRequestedToCreate.Contains("dummyNamespace.dummyType"));
         }
 
         [TestMethod]
-        public void Load_WillHandleFileException_WhenAssemblyNotFound()
+        public void LoadAssembly_WillHandleFileException_WhenAssemblyNotFound()
         {
             var loader = new Fake_Loader();
             string assemblyPath = @"\somePath\dummyAssembly.dll";
 
             loader.ForceAssemblyNotFound = true;
-            loader.Load(assemblyPath, "dummyNamespace.dummyType");
+            loader.LoadAssembly(assemblyPath);
 
             // Implicit assert: exception thrown by Show() would make this test fail
         }
 
         [TestMethod]
-        public void Load_WillQuitImmediately_WhenAssemblyPathEmpty()
+        public void LoadAssembly_WillQuitImmediately_WhenAssemblyPathEmpty()
         {
             var loader = new Fake_Loader();
 
-            loader.Load("", "dummyNamespace.dummyType");
+            loader.LoadAssembly("");
 
             Assert.AreEqual(0, loader.LoadedAssemblies.Count);
         }
 
         [TestMethod]
-        public void Load_WillQuitImmediately_WhenTypeToCreateIsEmpty()
+        public void LoadType_WillQuitImmediately_WhenTypeToCreateIsEmpty()
         {
             var loader = new Fake_Loader();
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            loader.LoadAssembly("dummyAssembly.dll");
+            
+            loader.LoadType("");
 
-            loader.Load("dummyAssembly.dll", "");
-
-            Assert.AreEqual(0, loader.LoadedAssemblies.Count);
+            Assert.AreEqual(0, loader.TypesRequestedToCreate.Count);
         }
 
         [TestMethod]
@@ -184,7 +187,8 @@ namespace Cider_x64.UnitTests
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("dummyNamespace.dummyType");
 
             loader.Show();
 
@@ -198,7 +202,8 @@ namespace Cider_x64.UnitTests
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("dummyNamespace.dummyType");
 
             loader.Show();
 
@@ -212,7 +217,8 @@ namespace Cider_x64.UnitTests
             var dummyUserControl = new UserControl();
             loader.ForcedCreatedInstance = dummyUserControl;
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("dummyNamespace.dummyType");
 
             loader.Show();
 
@@ -226,7 +232,8 @@ namespace Cider_x64.UnitTests
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("dummyNamespace.dummyType");
 
             loader.Show();
 
@@ -234,14 +241,15 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Load_WillCreateGuiPreviewer_Always()
+        public void LoadType_WillCreateGuiPreviewer_Always()
         {
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
             loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            loader.LoadAssembly("dummyAssembly.dll");
 
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadType("dummyNamespace.dummyType");
 
             Assert.IsNotNull(loader.GetGuiPreviewer());
         }
@@ -256,7 +264,7 @@ namespace Cider_x64.UnitTests
             var dummyWindow = new Window();
             loader.ForcedCreatedInstance = dummyWindow;
             loader.SetAlternativeGuiTypesExtractor(stubGuiTypesExtractor);
-            loader.Load("dummyAssembly.dll", "dummyNamespace.dummyType");
+            loader.LoadAssembly("dummyAssembly.dll");
 
             var guiTypeNames = loader.GetLoadedAssemblyTypeNames();
 

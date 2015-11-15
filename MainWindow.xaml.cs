@@ -113,7 +113,8 @@ namespace Cider_x64
             // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
             m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
 
-            m_Loader.Load(m_Project.AssemblyOfPreviewedGui, m_Project.TypeOfPreviewedGui);
+            m_Loader.LoadAssembly(m_Project.AssemblyOfPreviewedGui);
+            m_Loader.LoadType(m_Project.TypeOfPreviewedGui);
 
             var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
             viewModel.ListOfSelectedAssemblyTypes = new ObservableCollection<string>(asmTypes);
@@ -226,7 +227,10 @@ namespace Cider_x64
                 m_Project.TypeOfPreviewedGui = type as String;
                 viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
 
-                m_Restarter.Restart();
+                m_Loader.CloseWindow();
+                m_Loader.LoadType(type as string);
+                m_Loader.Show();
+                // m_Restarter.Restart();
             }
         }
     }
