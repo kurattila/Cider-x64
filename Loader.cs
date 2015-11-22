@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Cider_x64
 {
@@ -141,8 +140,17 @@ namespace Cider_x64
             if (string.IsNullOrEmpty(namespaceDotType))
                 return; // settings uninitialized
 
-            m_InstanceCreated = createInstanceOfType(m_AssemblyWrapper, namespaceDotType);
-            m_NamespaceDotTypeCreated = namespaceDotType;
+            try
+            {
+                m_InstanceCreated = createInstanceOfType(m_AssemblyWrapper, namespaceDotType);
+                m_NamespaceDotTypeCreated = namespaceDotType;
+            }
+            catch (TargetInvocationException targetInvocationException)
+            {
+                var xamlParseException = targetInvocationException.InnerException as System.Windows.Markup.XamlParseException;
+                if (xamlParseException != null && xamlParseException.InnerException != null)
+                    throw new MissingPreloadException("", targetInvocationException);
+            }
 
             m_GuiPreviewer = GuiPreviewerFactory.Create(m_InstanceCreated);
             m_GuiPreviewer.PreviewerWindow.Title = m_NamespaceDotTypeCreated;
@@ -157,12 +165,13 @@ namespace Cider_x64
 
         public virtual void Show()
         {
-            m_GuiPreviewer.PreviewerWindow.Show();
+            if (m_GuiPreviewer != null)
+                m_GuiPreviewer.PreviewerWindow.Show();
         }
 
         public void CloseWindow()
         {
-            if (m_GuiPreviewer.PreviewerWindow.IsVisible)
+            if (m_GuiPreviewer != null && m_GuiPreviewer.PreviewerWindow.IsVisible)
                 m_GuiPreviewer.PreviewerWindow.Close();
         }
 

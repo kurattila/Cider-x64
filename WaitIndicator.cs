@@ -34,6 +34,9 @@ namespace Cider_x64
 
         public void EndWaiting()
         {
+            if (!IsBackgroundGuiThreadRunning())
+                return;
+
             // Request the WaitWindow to close (will include a fade-out animation while closing, so it'll take some time)
             m_WaitWindow.DispatcherInstance.BeginInvoke(new Action(() =>
             {
@@ -99,6 +102,7 @@ namespace Cider_x64
                 if (disposing)
                 {
                     // dispose managed state (managed objects).
+                    EndWaiting();
                     m_WaitWindowShownEvent.Dispose();
                     m_WaitWindowClosedEvent.Dispose();
                 }

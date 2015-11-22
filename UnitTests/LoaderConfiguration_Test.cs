@@ -29,6 +29,24 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
+        public void SaveSettings_WillSaveEmptyNonNullStrings_WhenNullStringsRequiredToBeSaved()
+        {
+            var loaderConfig = new Fake_LoaderConfiguration();
+            loaderConfig.AssemblyOfPreviewedGui = null;
+            loaderConfig.TypeOfPreviewedGui = null;
+            loaderConfig.ResourceDictionaryToAdd = null;
+
+            loaderConfig.SaveSettings();
+
+            Assert.AreEqual(4, loaderConfig.SettingsSaved.Count);
+            Assert.AreEqual("", loaderConfig.SettingsSaved[LoaderConfiguration.SettingsName_AssemblyFullPath]);
+            Assert.AreEqual("", loaderConfig.SettingsSaved[LoaderConfiguration.SettingsName_Type]);
+            Assert.AreEqual("", loaderConfig.SettingsSaved[LoaderConfiguration.SettingsName_ToAddMergedDictionary]);
+            var preloadedAssemblies = loaderConfig.SettingsSaved[LoaderConfiguration.SettingsName_PreloadedAssemblies] as string[];
+            Assert.AreEqual(0, preloadedAssemblies.Length);
+        }
+
+        [TestMethod]
         public void LoadSettings_WillLoadAllData_Always()
         {
             var loaderConfig = new Fake_LoaderConfiguration();

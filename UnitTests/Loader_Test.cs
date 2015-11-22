@@ -5,6 +5,8 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Controls;
+using System.IO;
+using System.Windows.Markup;
 
 namespace Cider_x64.UnitTests
 {
@@ -57,6 +59,38 @@ namespace Cider_x64.UnitTests
         public IGuiPreviewer GetGuiPreviewer()
         {
             return m_GuiPreviewer;
+        }
+    }
+
+    class Fake2_Loader : Loader
+    {
+        public bool ForceAssemblyNotFound = false;
+        protected override AssemblyWrapper loadAssembly(string assemblyPath)
+        {
+            if (ForceAssemblyNotFound)
+                throw new System.IO.FileNotFoundException();
+
+            var wrapper = new AssemblyWrapper() { Path = assemblyPath, Assembly = null };
+            return wrapper;
+        }
+
+        public void SetAlternativeGuiTypesExtractor(GuiTypesExtractor alternativeExtractor)
+        {
+            TypesExtractor = alternativeExtractor;
+        }
+    }
+
+    class Fake3_Loader : Loader
+    {
+        public Exception ForcedThrowExceptionDuringCreateInstance = null;
+        protected override object createInstanceOfType(AssemblyWrapper assemblyOfType, string namespaceDotType)
+        {
+            throw ForcedThrowExceptionDuringCreateInstance;
+        }
+
+        public void SetAlternativeGuiTypesExtractor(GuiTypesExtractor alternativeExtractor)
+        {
+            TypesExtractor = alternativeExtractor;
         }
     }
 
@@ -241,7 +275,20 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void LoadType_WillCreateGuiPreviewer_Always()
+        public void Show_WontThrow_WhenNamespaceDotTypeEmpty()
+        {
+            var loader = new Fake2_Loader();
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            var dummyWindow = new Window();
+            loader.LoadAssembly("dummyAssembly.dll");
+
+            loader.LoadType("");
+
+            loader.Show();
+        }
+
+        [TestMethod]
+        public void LoadType_WillCreateGuiPreviewer_WhenNamespaceDotTypeNotEmpty()
         {
             var loader = new Fake_Loader();
             var dummyWindow = new Window();
@@ -252,6 +299,47 @@ namespace Cider_x64.UnitTests
             loader.LoadType("dummyNamespace.dummyType");
 
             Assert.IsNotNull(loader.GetGuiPreviewer());
+        }
+
+        [TestMethod]
+        public void LoadType_WontCreateGuiPreviewer_WhenNamespaceDotTypeEmpty()
+        {
+            var loader = new Fake_Loader();
+            var dummyWindow = new Window();
+            loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            loader.LoadAssembly("dummyAssembly.dll");
+
+            loader.LoadType("");
+
+            Assert.IsNull(loader.GetGuiPreviewer());
+        }
+
+        [TestMethod]
+        public void LoadType_WillThrowMissingPreloadException_WhenCreateInstanceThrowsFileNotFound()
+        {
+            var loader = new Fake3_Loader();
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            loader.LoadAssembly("dummyAssembly.dll");
+            var fileNotFoundException = new FileNotFoundException("", "dummyAssemblyStyles.dll");
+            var xamlParseException = new XamlParseException("", fileNotFoundException);
+            var targetInvocationException = new TargetInvocationException(xamlParseException);
+            loader.ForcedThrowExceptionDuringCreateInstance = targetInvocationException;
+            Exception thrownMissingPreloadException = null;
+
+            try
+            {
+                loader.LoadType("dummyNamespace.dummyType");
+            }
+            catch(MissingPreloadException e)
+            {
+                thrownMissingPreloadException = e;
+            }
+
+            Assert.IsNotNull(thrownMissingPreloadException);
+            Assert.IsInstanceOfType(thrownMissingPreloadException.InnerException, typeof(TargetInvocationException));
+            Assert.IsInstanceOfType(thrownMissingPreloadException.InnerException.InnerException, typeof(XamlParseException));
+            Assert.IsNotNull(thrownMissingPreloadException.InnerException.InnerException.InnerException);
         }
 
         [TestMethod]
@@ -269,6 +357,20 @@ namespace Cider_x64.UnitTests
             var guiTypeNames = loader.GetLoadedAssemblyTypeNames();
 
             Assert.AreEqual(2, guiTypeNames.Count);
+        }
+
+        [TestMethod]
+        public void CloseWindow_WontThrow_WhenNamespaceDotTypeEmpty()
+        {
+            var loader = new Fake2_Loader();
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            var dummyWindow = new Window();
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("");
+
+            loader.Show();
+
+            loader.CloseWindow();
         }
 
         class Fake_GuiTypesExtractor : GuiTypesExtractor

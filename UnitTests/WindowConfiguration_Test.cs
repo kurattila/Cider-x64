@@ -69,13 +69,37 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void ValidSettings_ReturnsFalse_WhenAtLeastOneSettingDoesNotMakeSense()
+        public void ValidSettings_ReturnsFalse_WhenAtLeastOneSettingUndefined()
         {
             var winConfig = new Fake_WindowConfiguration("winOne");
             winConfig.Left = 10;
             //winConfig.Top = 20;
             winConfig.Width = 30;
             winConfig.Height = 40;
+
+            Assert.IsFalse(winConfig.ValidSettings());
+        }
+
+        [TestMethod]
+        public void ValidSettings_ReturnsFalse_WhenWidthNegative()
+        {
+            var winConfig = new Fake_WindowConfiguration("winOne");
+            winConfig.Left = 10;
+            winConfig.Top = 20;
+            winConfig.Width = -2147483648;
+            winConfig.Height = 40;
+
+            Assert.IsFalse(winConfig.ValidSettings());
+        }
+
+        [TestMethod]
+        public void ValidSettings_ReturnsFalse_WhenHeightNegative()
+        {
+            var winConfig = new Fake_WindowConfiguration("winOne");
+            winConfig.Left = 10;
+            winConfig.Top = 20;
+            winConfig.Width = 30;
+            winConfig.Height = -2147483648;
 
             Assert.IsFalse(winConfig.ValidSettings());
         }

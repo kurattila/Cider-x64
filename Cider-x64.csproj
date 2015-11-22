@@ -67,6 +67,7 @@
     <Compile Include="Helpers\AttachedCommandBehavior\SimpleCommand.cs" />
     <Compile Include="IWindow.cs" />
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
+    <Compile Include="MissingPreloadException.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ObservableBase.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />

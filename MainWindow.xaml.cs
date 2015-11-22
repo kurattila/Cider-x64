@@ -95,33 +95,50 @@ namespace Cider_x64
         ILoader m_Loader;
         void showGuiPreview()
         {
-            var waitIndicator = new WaitIndicator();
-            waitIndicator.BeginWaiting(Left, Top, ActualWidth, ActualHeight);
-
-            string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
-            if (!string.IsNullOrEmpty(assemblyDirectory))
-                Directory.SetCurrentDirectory(assemblyDirectory);
-
-            m_Loader = m_LoaderFactory.Create();
-
-            // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
-            foreach (string assemblyToPreload in m_Project.PreloadedAssemblies)
+            using (var waitIndicator = new WaitIndicator())
             {
-                m_Loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, assemblyToPreload));
+                waitIndicator.BeginWaiting(Left, Top, ActualWidth, ActualHeight);
+
+                if (!File.Exists(m_Project.AssemblyOfPreviewedGui))
+                    return;
+
+                string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
+                if (!string.IsNullOrEmpty(assemblyDirectory))
+                    Directory.SetCurrentDirectory(assemblyDirectory);
+
+                m_Loader = m_LoaderFactory.Create();
+
+                // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
+                foreach (string assemblyToPreload in m_Project.PreloadedAssemblies)
+                {
+                    m_Loader.PreloadAssembly(System.IO.Path.Combine(assemblyDirectory, assemblyToPreload));
+                }
+
+                // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
+                m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
+
+                m_Loader.LoadAssembly(m_Project.AssemblyOfPreviewedGui);
+                var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
+                viewModel.ListOfSelectedAssemblyTypes = new ObservableCollection<string>(asmTypes);
+
+                try
+                {
+                    m_Loader.LoadType(m_Project.TypeOfPreviewedGui);
+                }
+                catch(MissingPreloadException e)
+                {
+                    waitIndicator.EndWaiting(); // dark progress overlay shall not obscure the MessageBox
+                    MessageBox.Show(this, e.GetAdviceForUser(), MissingPreloadException.TitleTextOfAdvice);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
+                    return;
+                }
+
+                m_Loader.Show();
             }
-
-            // Load XAML Dictionaries like "pack://application:,,,/AnyAssembly;component/AnyPath/AnyResourceDictionary.xaml"
-            m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
-
-            m_Loader.LoadAssembly(m_Project.AssemblyOfPreviewedGui);
-            m_Loader.LoadType(m_Project.TypeOfPreviewedGui);
-
-            var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
-            viewModel.ListOfSelectedAssemblyTypes = new ObservableCollection<string>(asmTypes);
-            
-            m_Loader.Show();
-
-            waitIndicator.EndWaiting();
         }
 
         bool _restartPending = false;
@@ -210,7 +227,10 @@ namespace Cider_x64
             // Process input if the user clicked OK.
             if (userClickedOK == true)
             {
-                viewModel.SelectedAssembly = fileDialog.FileName;
+                m_Project.AssemblyOfPreviewedGui = fileDialog.FileName;
+                m_Project.TypeOfPreviewedGui = null;
+                m_Project.SaveSettings();
+                m_Restarter.Restart();
             }
         }
 
@@ -228,8 +248,25 @@ namespace Cider_x64
                 viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
 
                 m_Loader.CloseWindow();
-                m_Loader.LoadType(type as string);
-                m_Loader.Show();
+                try
+                {
+                    m_Loader.LoadType(type as string);
+                }
+                catch(MissingPreloadException e)
+                {
+                    MessageBox.Show(this, e.GetAdviceForUser(), MissingPreloadException.TitleTextOfAdvice);
+                    return;
+                }
+
+                try
+                {
+                    m_Loader.Show();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
+                    return;
+                }
                 // m_Restarter.Restart();
             }
         }

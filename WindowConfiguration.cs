@@ -40,10 +40,13 @@ namespace Cider_x64
 
         public override bool ValidSettings()
         {
-            return (Left != WindowConfiguration.UndefinedValue
-                && Top != WindowConfiguration.UndefinedValue
-                && Width != WindowConfiguration.UndefinedValue
-                && Height != WindowConfiguration.UndefinedValue);
+            bool valid = Left != WindowConfiguration.UndefinedValue
+                      && Top != WindowConfiguration.UndefinedValue
+                      && Width != WindowConfiguration.UndefinedValue
+                      && Height != WindowConfiguration.UndefinedValue;
+            if (Width < 1 || Height < 1)
+                valid = false;
+            return valid;
         }
 
         public int Left { get; set; }

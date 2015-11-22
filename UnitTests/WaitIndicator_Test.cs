@@ -78,6 +78,30 @@ namespace Cider_x64.UnitTests
 
             Assert.IsFalse(waitIndicator.IsThreadRunning);
         }
+
+        [TestMethod]
+        public void EndWaiting_WontDeadlock_WhenCalledMoreThanOnce()
+        {
+            var waitIndicator = new Fake_WaitIndicator();
+            waitIndicator.ForcedThreadExecutionMillisecs = 2000;
+            waitIndicator.BeginWaiting(0, 0, 0, 0);
+
+            waitIndicator.EndWaiting();
+            waitIndicator.EndWaiting();
+        }
+
+        [TestMethod]
+        public void Dispose_WillCallEndWaiting_Always()
+        {
+            Fake_WaitIndicator waitIndicator = null;
+            using (waitIndicator = new Fake_WaitIndicator())
+            {
+                waitIndicator.ForcedThreadExecutionMillisecs = 2000;
+                waitIndicator.BeginWaiting(0, 0, 0, 0);
+            }
+
+            Assert.IsFalse(waitIndicator.IsThreadRunning);
+        }
     }
 
     class Fake_WaitWindow : IWindow

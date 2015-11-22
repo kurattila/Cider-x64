@@ -29,9 +29,9 @@ namespace Cider_x64
             base.SaveSettings();
 
             var regKey = getAppSettingsRegistrykey();
-            saveSingleSetting(regKey, SettingsName_AssemblyFullPath, AssemblyOfPreviewedGui);
-            saveSingleSetting(regKey, SettingsName_Type, TypeOfPreviewedGui);
-            saveSingleSetting(regKey, SettingsName_ToAddMergedDictionary, ResourceDictionaryToAdd);
+            saveSingleSetting(regKey, SettingsName_AssemblyFullPath, AssemblyOfPreviewedGui ?? "");
+            saveSingleSetting(regKey, SettingsName_Type, TypeOfPreviewedGui ?? "");
+            saveSingleSetting(regKey, SettingsName_ToAddMergedDictionary, ResourceDictionaryToAdd ?? "");
             saveSingleSetting(regKey, SettingsName_PreloadedAssemblies, PreloadedAssemblies.ToArray());
         }
 

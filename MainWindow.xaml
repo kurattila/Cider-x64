@@ -12,7 +12,6 @@
             <MenuItem Header="_File">
                 <MenuItem x:Name="miOpenFile" 
                           Header="_Open" 
-                          IsEnabled="False"
                           Command="{Binding ChangeAssemblyCommand}"
                           />
             </MenuItem>
