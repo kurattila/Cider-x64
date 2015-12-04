@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Cider_x64.Helpers;
+using Cider_x64.ViewModel;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -29,7 +32,7 @@ namespace Cider_x64
         ///  SelectedTypeOfPreview
         /// </summary>
         /// <returns>current SelectedTypeOfPreview</returns>
-        public String SelectedTypeOfPreview
+        public GuiTypeViewModel SelectedTypeOfPreview
         {
             get { return m_SelectedTypeOfPreview; }
             set
@@ -38,7 +41,7 @@ namespace Cider_x64
                 this.NotifyPropertyChanged("SelectedTypeOfPreview");
             }
         }
-        private String m_SelectedTypeOfPreview;
+        private GuiTypeViewModel m_SelectedTypeOfPreview;
         #endregion
 
         #region ListOfSelectedAssemblyTypes
@@ -46,7 +49,7 @@ namespace Cider_x64
         ///  ListOfSelectedAssemblyTypes
         /// </summary>
         /// <returns>current ListOfSelectedAssemblyTypes</returns>
-        public ObservableCollection<String> ListOfSelectedAssemblyTypes
+        public ObservableCollection<GuiTypeViewModel> ListOfSelectedAssemblyTypes
         {
             get { return m_ListOfSelectedAssemblyTypes; }
             set
@@ -55,8 +58,20 @@ namespace Cider_x64
                 this.NotifyPropertyChanged("ListOfSelectedAssemblyTypes");
             }
         }
-        private ObservableCollection<String> m_ListOfSelectedAssemblyTypes;
+        private ObservableCollection<GuiTypeViewModel> m_ListOfSelectedAssemblyTypes = new ObservableCollection<GuiTypeViewModel>();
         #endregion
+
+        public void InitWithGuiTypes(List<string> guiTypes)
+        {
+            ListOfSelectedAssemblyTypes.Clear();
+
+            foreach(string namespaceDotType in guiTypes)
+            {
+                var vm = new GuiTypeViewModel() { NamespaceDotType = namespaceDotType, IsShown = false };
+                vm.ShowCommand = new RelayCommand((param) => { ChangedTypeCommand.Execute(param); });
+                ListOfSelectedAssemblyTypes.Add(vm);
+            }
+        }
 
         #region Commands
         /// <summary>

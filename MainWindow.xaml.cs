@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Cider_x64
 {
@@ -119,25 +120,9 @@ namespace Cider_x64
 
                 m_Loader.LoadAssembly(m_Project.AssemblyOfPreviewedGui);
                 var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
-                viewModel.ListOfSelectedAssemblyTypes = new ObservableCollection<string>(asmTypes);
+                viewModel.InitWithGuiTypes(asmTypes);
 
-                try
-                {
-                    m_Loader.LoadType(m_Project.TypeOfPreviewedGui);
-                }
-                catch(MissingPreloadException e)
-                {
-                    waitIndicator.EndWaiting(); // dark progress overlay shall not obscure the MessageBox
-                    MessageBox.Show(this, e.GetAdviceForUser(), MissingPreloadException.TitleTextOfAdvice);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
-                    return;
-                }
-
-                m_Loader.Show();
+                ChangeType(m_Project.TypeOfPreviewedGui);
             }
         }
 
@@ -203,7 +188,6 @@ namespace Cider_x64
             if (m_Project.ValidSettings())
             {
                 viewModel.SelectedAssembly = m_Project.AssemblyOfPreviewedGui;
-                viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
             }
         }
 
@@ -238,35 +222,72 @@ namespace Cider_x64
         /// 
         /// </summary>
         /// <param name="type"></param>
-        private void ChangeType(object type)
+        private void ChangeType(object type, WaitIndicator waitIndicator = null)
         {
             if (type is String)
             {
-                Debug.WriteLine(type as String);
-                
-                m_Project.TypeOfPreviewedGui = type as String;
-                viewModel.SelectedTypeOfPreview = m_Project.TypeOfPreviewedGui;
+                bool success = true;
+
+                var typeToLoad = type as string;
+                Debug.WriteLine(typeToLoad);
+
+                m_Project.TypeOfPreviewedGui = typeToLoad;
 
                 m_Loader.CloseWindow();
+
+
+                ViewModel.GuiTypeViewModel activeRow = null;
+                MainViewModel vm = this.DataContext as MainViewModel;
+                if (vm != null)
+                {
+                    foreach (var row in vm.ListOfSelectedAssemblyTypes)
+                    {
+                        bool isActiveRow = row.NamespaceDotType == typeToLoad;
+                        if (isActiveRow)
+                        {
+                            activeRow = row;
+                            row.IsShown = true;
+                        }
+                        else
+                        {
+                            row.IsShown = false;
+                        }
+                    }
+                }
+
                 try
                 {
-                    m_Loader.LoadType(type as string);
+                    m_Loader.LoadType(typeToLoad);
                 }
                 catch(MissingPreloadException e)
                 {
+                    if (waitIndicator != null)
+                        waitIndicator.EndWaiting(); // dark progress overlay shall not obscure the MessageBox
                     MessageBox.Show(this, e.GetAdviceForUser(), MissingPreloadException.TitleTextOfAdvice);
-                    return;
-                }
-
-                try
-                {
-                    m_Loader.Show();
+                    success = false;
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
-                    return;
+                    success = false;
                 }
+
+                if (success)
+                {
+                    try
+                    {
+                        m_Loader.Show();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
+                        success = false;
+                    }
+                }
+
+                if (!success && activeRow != null)
+                    activeRow.IsShown = false;
+
                 // m_Restarter.Restart();
             }
         }

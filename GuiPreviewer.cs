@@ -28,6 +28,7 @@ namespace Cider_x64
         {
             m_PreviewerWindow = guiInstanceToCreatePreviewerFor;
             m_PreviewerWindow.ShowInTaskbar = false;
+            m_PreviewerWindow.Topmost = true;
         }
 
         public Window PreviewerWindow
@@ -48,6 +49,7 @@ namespace Cider_x64
             m_PreviewerWindow = new Window()
             {
                 Content = guiInstanceToCreatePreviewerFor,
+                Topmost = true,
                 ShowInTaskbar = false
             };
         }

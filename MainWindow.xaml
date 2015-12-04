@@ -6,46 +6,64 @@
         xmlns:local="clr-namespace:Cider_x64"
         xmlns:acb="clr-namespace:Cider_x64.Helpers.AttachedCommandBehavior"
         mc:Ignorable="d"
-        Title="Cider x64" Height="350" Width="525" >
-    <DockPanel LastChildFill="True">
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem x:Name="miOpenFile" 
-                          Header="_Open" 
-                          Command="{Binding ChangeAssemblyCommand}"
-                          />
-            </MenuItem>
-        </Menu>
+        d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
+        <DockPanel LastChildFill="True">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem x:Name="miOpenFile" 
+                              Header="_Open" 
+                              Command="{Binding ChangeAssemblyCommand}"
+                              />
+                </MenuItem>
+            </Menu>
 
-        <Button DockPanel.Dock="Bottom" 
-                Click="requestAppRestart" 
-                Width="Auto">Restart</Button>
+            <Button DockPanel.Dock="Bottom" 
+                    Click="requestAppRestart" 
+                    Width="Auto">Restart</Button>
 
-        <TextBlock DockPanel.Dock="Top" 
-                   Margin="8,8,8,0" 
-                   Text="Selected assembly :" />
+            <TextBlock DockPanel.Dock="Top" 
+                       Margin="8,8,8,0" 
+                       Text="Selected assembly :" />
 
-        <TextBlock DockPanel.Dock="Top" 
-                   Margin="8,2,8,0"  
-                   Text="{Binding SelectedAssembly}" />
+            <TextBlock DockPanel.Dock="Top" 
+                       Margin="8,2,8,0"  
+                       Text="{Binding SelectedAssembly}" />
 
-        <TextBlock DockPanel.Dock="Top" 
-                   Margin="8,8,8,0" 
-                   Text="Selected type of preview :" />
+            <TextBlock DockPanel.Dock="Top" 
+                       Margin="8,8,8,0" 
+                       Text="GUI types for preview :" />
 
-        <TextBlock DockPanel.Dock="Top" 
-                   Margin="8,2,8,0"  
-                   Text="{Binding SelectedTypeOfPreview}" />
+            <ListBox x:Name="lbDllItemsList" 
+                     DockPanel.Dock="Top" 
+                     Margin="8"
+                     ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="local:GuiTypeViewModel">
+                        <DockPanel LastChildFill="True" >
+                            <Button x:Name="showButton" DockPanel.Dock="Left"
+                                    Command="{Binding ShowCommand}"
+                                    CommandParameter="{Binding NamespaceDotType}">Show</Button>
+                            <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
+                        </DockPanel>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="False">
+                                <Setter TargetName="showButton" Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsShown}" Value="True">
+                                <Setter TargetName="guiTypeName" Property="Foreground" Value="Blue"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                
+            </ListBox>
 
-        <ListBox x:Name="lbDllItemsList" 
-                 DockPanel.Dock="Top" 
-                 Margin="8"
-                 ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}"
-                 SelectedItem="{Binding Path=SelectedTypeOfPreview, Mode=TwoWay}"
-                 acb:CommandBehavior.Event="MouseDoubleClick"
-                 acb:CommandBehavior.CommandParameter="{Binding SelectedTypeOfPreview}"
-                 acb:CommandBehavior.Command="{Binding ChangedTypeCommand}"
-            />
-
-    </DockPanel>
+        </DockPanel>
 </Window>

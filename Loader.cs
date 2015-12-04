@@ -14,6 +14,9 @@ namespace Cider_x64
         static Loader()
         {
             DesignerProperties.IsInDesignModeProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.OverridesInheritanceBehavior | FrameworkPropertyMetadataOptions.Inherits));
+
+            // Support also design-time queries through LicenseManager?
+            // LicenseManager.UsageMode == LicenseUsageMode.Designtime;
         }
 
         public Loader()
@@ -65,7 +68,7 @@ namespace Cider_x64
             if (m_WindowConfig.ValidSettings())
             {
                 Window previewWindow = sender as Window;
-//                 previewWindow.Topmost = true;
+                previewWindow.Topmost = true;
 
                 previewWindow.Left = m_WindowConfig.Left;
                 previewWindow.Top = m_WindowConfig.Top;
