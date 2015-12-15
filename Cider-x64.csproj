@@ -68,6 +68,7 @@
     <Compile Include="IWindow.cs" />
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
     <Compile Include="MissingPreloadException.cs" />
+    <Compile Include="PlayStopButton.cs" />
     <Compile Include="ViewModel\GuiTypeViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ObservableBase.cs" />
@@ -93,6 +94,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WaitWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -47,15 +47,22 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="local:GuiTypeViewModel">
                         <DockPanel LastChildFill="True" >
-                            <Button x:Name="showButton" DockPanel.Dock="Left"
-                                    Command="{Binding ShowCommand}"
-                                    CommandParameter="{Binding NamespaceDotType}">Show</Button>
+                            <local:PlayStopButton x:Name="showButton" DockPanel.Dock="Left"
+                                                  Command="{Binding ShowCommand}"
+                                                  CommandParameter="{Binding NamespaceDotType}"
+                                                  IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
                             <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
                         </DockPanel>
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="False">
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="False" />
+                                    <Condition Binding="{Binding IsShown}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
                                 <Setter TargetName="showButton" Property="Visibility" Value="Hidden"/>
-                            </DataTrigger>
+                            </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
                             <DataTrigger Binding="{Binding IsShown}" Value="True">
                                 <Setter TargetName="guiTypeName" Property="Foreground" Value="Blue"/>
                             </DataTrigger>
