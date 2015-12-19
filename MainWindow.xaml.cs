@@ -48,6 +48,9 @@ namespace Cider_x64
         void MainWindow_Initialized(object sender, EventArgs e)
         {
             m_Project.LoadSettings();
+            m_SwitcherOfLoadedType.LoaderConfiguration = m_Project;
+            m_SwitcherOfLoadedType.MessageBoxOwner = this;
+
             m_WindowConfig.LoadSettings();
             if (m_WindowConfig.ValidSettings())
             {
@@ -122,6 +125,7 @@ namespace Cider_x64
                 var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
                 viewModel.InitWithGuiTypes(asmTypes);
 
+                m_SwitcherOfLoadedType.Loader = m_Loader;
                 ChangeType(m_Project.TypeOfPreviewedGui);
             }
         }
@@ -176,7 +180,8 @@ namespace Cider_x64
             if (vm != null)
             {
                 vm.ChangeAssemblyCommand = new Helpers.RelayCommand((param) => ChangeAssembly());
-                vm.ChangedTypeCommand = new Helpers.RelayCommand((param) => ChangeType(param));
+                vm.ChangeTypeCommand = new Helpers.RelayCommand((param) => ChangeType(param));
+                m_SwitcherOfLoadedType.MainViewModel = vm;
             }
         }
 
@@ -218,78 +223,15 @@ namespace Cider_x64
             }
         }
 
+        SwitcherOfLoadedType m_SwitcherOfLoadedType = new SwitcherOfLoadedType();
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type"></param>
         private void ChangeType(object type, WaitIndicator waitIndicator = null)
         {
-            if (type is String)
-            {
-                bool success = true;
-
-                var typeToLoad = type as string;
-                Debug.WriteLine(typeToLoad);
-
-                m_Project.TypeOfPreviewedGui = typeToLoad;
-
-                m_Loader.CloseWindow();
-
-
-                ViewModel.GuiTypeViewModel activeRow = null;
-                MainViewModel vm = this.DataContext as MainViewModel;
-                if (vm != null)
-                {
-                    foreach (var row in vm.ListOfSelectedAssemblyTypes)
-                    {
-                        bool isActiveRow = row.NamespaceDotType == typeToLoad;
-                        if (isActiveRow)
-                        {
-                            activeRow = row;
-                            row.IsShown = true;
-                        }
-                        else
-                        {
-                            row.IsShown = false;
-                        }
-                    }
-                }
-
-                try
-                {
-                    m_Loader.LoadType(typeToLoad);
-                }
-                catch(MissingPreloadException e)
-                {
-                    if (waitIndicator != null)
-                        waitIndicator.EndWaiting(); // dark progress overlay shall not obscure the MessageBox
-                    MessageBox.Show(this, e.GetAdviceForUser(), MissingPreloadException.TitleTextOfAdvice);
-                    success = false;
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
-                    success = false;
-                }
-
-                if (success)
-                {
-                    try
-                    {
-                        m_Loader.Show();
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(this, InnermostExceptionExtractor.GetInnermostMessage(e));
-                        success = false;
-                    }
-                }
-
-                if (!success && activeRow != null)
-                    activeRow.IsShown = false;
-
-                // m_Restarter.Restart();
-            }
+            m_SwitcherOfLoadedType.ToggleType(type as string, waitIndicator);
         }
     }
 }

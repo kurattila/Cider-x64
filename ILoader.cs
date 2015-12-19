@@ -10,6 +10,8 @@
         void Hide();
         void CloseWindow();
 
+        event System.EventHandler PreviewWindowClosed;
+
         /// <summary>
         /// Get list of loaded assembly type names. Assembly must be already loaded to obtain valid list.
         /// </summary>

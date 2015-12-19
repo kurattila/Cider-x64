@@ -69,6 +69,7 @@
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
     <Compile Include="MissingPreloadException.cs" />
     <Compile Include="PlayStopButton.cs" />
+    <Compile Include="SwitcherOfLoadedType.cs" />
     <Compile Include="ViewModel\GuiTypeViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ObservableBase.cs" />

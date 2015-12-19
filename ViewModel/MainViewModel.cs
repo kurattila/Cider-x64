@@ -68,7 +68,7 @@ namespace Cider_x64
             foreach(string namespaceDotType in guiTypes)
             {
                 var vm = new GuiTypeViewModel() { NamespaceDotType = namespaceDotType, IsShown = false };
-                vm.ShowCommand = new RelayCommand((param) => { ChangedTypeCommand.Execute(param); });
+                vm.ShowCommand = new RelayCommand((param) => { ChangeTypeCommand.Execute(param); });
                 ListOfSelectedAssemblyTypes.Add(vm);
             }
         }
@@ -81,7 +81,7 @@ namespace Cider_x64
         /// <summary>
         /// This command reacts on change in selected type
         /// </summary>
-        public ICommand ChangedTypeCommand { get; set; }
+        public ICommand ChangeTypeCommand { get; set; }
         #endregion //Commands
     }
 }

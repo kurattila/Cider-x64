@@ -86,6 +86,9 @@ namespace Cider_x64
             m_WindowConfig.Width = (int)previewWindow.Width;
             m_WindowConfig.Height = (int)previewWindow.Height;
             m_WindowConfig.SaveSettings();
+
+            if (PreviewWindowClosed != null)
+                PreviewWindowClosed(this, new EventArgs());
         }
 
         public void AddMergedDictionary(string packUriStringOfResDictXaml)
@@ -177,6 +180,8 @@ namespace Cider_x64
             if (m_GuiPreviewer != null && m_GuiPreviewer.PreviewerWindow.IsVisible)
                 m_GuiPreviewer.PreviewerWindow.Close();
         }
+
+        public event System.EventHandler PreviewWindowClosed;
 
         virtual protected object createInstanceOfType(AssemblyWrapper assemblyOfType, string namespaceDotType)
         {

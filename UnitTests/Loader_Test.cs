@@ -381,5 +381,23 @@ namespace Cider_x64.UnitTests
                 return ForcedExtractedGuiTypes;
             }
         }
+
+        [TestMethod]
+        public void ClosingTheWindowByUser_WillFirePreviewWindowClosedEvent_Always()
+        {
+            var loader = new Fake_Loader();
+            var dummyWindow = new Window();
+            loader.ForcedCreatedInstance = dummyWindow;
+            loader.SetAlternativeGuiTypesExtractor(new Fake_GuiTypesExtractor());
+            loader.LoadAssembly("dummyAssembly.dll");
+            loader.LoadType("dummyNamespace.dummyType");
+            loader.Show();
+            bool eventFired = false;
+            loader.PreviewWindowClosed += (sender, args) => eventFired = true;
+
+            dummyWindow.Close();
+
+            Assert.AreEqual(true, eventFired);
+        }
     }
 }
