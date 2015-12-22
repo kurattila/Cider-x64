@@ -122,6 +122,7 @@ namespace Cider_x64
                 m_Loader.AddMergedDictionary(m_Project.ResourceDictionaryToAdd);
 
                 m_Loader.LoadAssembly(m_Project.AssemblyOfPreviewedGui);
+                m_Project.AddMruItem(m_Project.AssemblyOfPreviewedGui);
                 var asmTypes = m_Loader.GetLoadedAssemblyTypeNames();
                 viewModel.InitWithGuiTypes(asmTypes);
 
@@ -181,6 +182,7 @@ namespace Cider_x64
             {
                 vm.ChangeAssemblyCommand = new Helpers.RelayCommand((param) => ChangeAssembly());
                 vm.ChangeTypeCommand = new Helpers.RelayCommand((param) => ChangeType(param));
+                vm.MruFileCommand = new Helpers.RelayCommand((param) => ChangeAssembly((param as ViewModel.FileMenuItemViewModel).Title));
                 m_SwitcherOfLoadedType.MainViewModel = vm;
             }
         }
@@ -193,6 +195,7 @@ namespace Cider_x64
             if (m_Project.ValidSettings())
             {
                 viewModel.SelectedAssembly = m_Project.AssemblyOfPreviewedGui;
+                viewModel.FileMenuItems = m_Project.GetFileMenuItemsCollection();
             }
         }
 
@@ -215,12 +218,15 @@ namespace Cider_x64
 
             // Process input if the user clicked OK.
             if (userClickedOK == true)
-            {
-                m_Project.AssemblyOfPreviewedGui = fileDialog.FileName;
-                m_Project.TypeOfPreviewedGui = null;
-                m_Project.SaveSettings();
-                m_Restarter.Restart();
-            }
+                ChangeAssembly(fileDialog.FileName);
+        }
+
+        private void ChangeAssembly(string assemblyPath)
+        {
+            m_Project.AssemblyOfPreviewedGui = assemblyPath;
+            m_Project.TypeOfPreviewedGui = null;
+            m_Project.SaveSettings();
+            m_Restarter.Restart();
         }
 
         SwitcherOfLoadedType m_SwitcherOfLoadedType = new SwitcherOfLoadedType();

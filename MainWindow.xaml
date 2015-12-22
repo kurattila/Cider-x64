@@ -8,13 +8,39 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
+        <Window.Resources>
+            <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
+        </Window.Resources>
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem x:Name="miOpenFile" 
-                              Header="_Open" 
-                              Command="{Binding ChangeAssemblyCommand}"
-                              />
+                    <MenuItem.ItemsSource>
+                        <CompositeCollection>
+                            <MenuItem x:Name="miOpenFile" 
+                                  Header="_Open" 
+                                  Command="{Binding ChangeAssemblyCommand}"
+                                  />
+                            <CollectionContainer Collection="{Binding Source={StaticResource mruAssemblies}}" />
+                        </CompositeCollection>
+                    </MenuItem.ItemsSource>
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="MenuItem.Header" Value="{Binding Title}"/>
+                            <Setter Property="MenuItem.Command" Value="{Binding Path=DataContext.MruFileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="MenuItem.CommandParameter" Value="{Binding .}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Separator />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
                 </MenuItem>
             </Menu>
 

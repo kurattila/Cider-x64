@@ -27,7 +27,7 @@ namespace Cider_x64.ViewModel
                 if (value != m_ShowCommand)
                 {
                     m_ShowCommand = value;
-                    NotifyPropertyChanged("m_ShowCommand");
+                    NotifyPropertyChanged("ShowCommand");
                 }
             }
         }

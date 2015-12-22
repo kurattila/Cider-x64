@@ -61,6 +61,20 @@ namespace Cider_x64
         private ObservableCollection<GuiTypeViewModel> m_ListOfSelectedAssemblyTypes = new ObservableCollection<GuiTypeViewModel>();
         #endregion
 
+        ObservableCollection<FileMenuItemViewModel> m_FileMenuItems;
+        public ObservableCollection<FileMenuItemViewModel> FileMenuItems
+        {
+            get { return m_FileMenuItems; }
+            set
+            {
+                if (m_FileMenuItems != value)
+                {
+                    m_FileMenuItems = value;
+                    NotifyPropertyChanged("FileMenuItems");
+                }
+            }
+        }
+
         public void InitWithGuiTypes(List<string> guiTypes)
         {
             ListOfSelectedAssemblyTypes.Clear();
@@ -82,6 +96,10 @@ namespace Cider_x64
         /// This command reacts on change in selected type
         /// </summary>
         public ICommand ChangeTypeCommand { get; set; }
+        /// <summary>
+        /// Loads a different assembly
+        /// </summary>
+        public ICommand MruFileCommand { get; set; }
         #endregion //Commands
     }
 }
