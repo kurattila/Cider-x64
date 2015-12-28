@@ -32,6 +32,7 @@ namespace Cider_x64
         public LoaderConfiguration LoaderConfiguration { get; set; }
         public Window MessageBoxOwner { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         virtual protected void showMessageBoxSeam(string message, string caption)
         {
             MessageBox.Show(MessageBoxOwner, message, caption);

@@ -183,6 +183,7 @@ namespace Cider_x64
 
         public event System.EventHandler PreviewWindowClosed;
 
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         virtual protected object createInstanceOfType(AssemblyWrapper assemblyOfType, string namespaceDotType)
         {
             Type typeToCreate = assemblyOfType.Assembly.GetType(namespaceDotType);

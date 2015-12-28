@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -87,6 +88,7 @@ namespace Cider_x64
             return null;
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual IWindow createWindow()
         {
             return new WaitWindow();

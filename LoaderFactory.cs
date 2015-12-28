@@ -17,6 +17,7 @@ namespace Cider_x64
             string dir = m_LoaderDomain.SetupInformation.ApplicationBase;
 
             string selfAssemblyName = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
+            selfAssemblyName = Uri.UnescapeDataString(selfAssemblyName); // e.g. otherwise, spaces in the path of our .EXE would be represented as '%20'
 
             ILoader loader = (ILoader) m_LoaderDomain.CreateInstanceFromAndUnwrap(selfAssemblyName, "Cider_x64.Loader");
             return loader;

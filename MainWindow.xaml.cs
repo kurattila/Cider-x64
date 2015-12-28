@@ -60,16 +60,7 @@ namespace Cider_x64
                 this.Height = m_WindowConfig.Height;
             }
 
-            try
-            {
-                _fsWatcher = new FileSystemWatcher(Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui));
-                _fsWatcher.Changed += fsWatcher_Changed;
-                _fsWatcher.EnableRaisingEvents = true;
-            }
-            catch (System.ArgumentException)
-            {
-                // Assembly path may be wrong
-            }
+            m_RestartHandler.Init(new AppRestarter(), Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui));
 
             InitializeViewModel();
         }
@@ -94,7 +85,7 @@ namespace Cider_x64
             m_Project.SaveSettings();
         }
 
-        FileSystemWatcher _fsWatcher;
+        RestartHandler m_RestartHandler = new RestartHandler();
 
         ILoader m_Loader;
         void showGuiPreview()
@@ -131,31 +122,14 @@ namespace Cider_x64
             }
         }
 
-        bool _restartPending = false;
-        void fsWatcher_Changed(object sender, System.IO.FileSystemEventArgs e)
-        {
-            string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
-            if (Path.GetDirectoryName(e.FullPath) == assemblyDirectory)
-            {
-                if (_restartPending)
-                    return;
-                _restartPending = true;
-
-                _fsWatcher.EnableRaisingEvents = false;
-
-                requestAppRestart(null, null);
-            }
-        }
-
-        AppRestarter m_Restarter = new AppRestarter();
         void requestAppRestart(object sender, RoutedEventArgs e)
         {
-            m_Restarter.Restart();
+            m_RestartHandler.RestartNow();
         }
 
         public void Dispose()
         {
-            _fsWatcher.Dispose();
+            m_RestartHandler.Dispose();
         }
 
         /// <summary>
@@ -226,7 +200,7 @@ namespace Cider_x64
             m_Project.AssemblyOfPreviewedGui = assemblyPath;
             m_Project.TypeOfPreviewedGui = null;
             m_Project.SaveSettings();
-            m_Restarter.Restart();
+            m_RestartHandler.RestartNow();
         }
 
         SwitcherOfLoadedType m_SwitcherOfLoadedType = new SwitcherOfLoadedType();

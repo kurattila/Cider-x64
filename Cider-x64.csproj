@@ -59,6 +59,7 @@
     </ApplicationDefinition>
     <Compile Include="AppRestarter.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="FsWatcherProxy.cs" />
     <Compile Include="GuiPreviewer.cs" />
     <Compile Include="GuiTypesExtractor.cs" />
     <Compile Include="Helpers\AttachedCommandBehavior\BehaviorBinding.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
     <Compile Include="MissingPreloadException.cs" />
     <Compile Include="PlayStopButton.cs" />
+    <Compile Include="RestartHandler.cs" />
     <Compile Include="SwitcherOfLoadedType.cs" />
     <Compile Include="ViewModel\FileMenuItemViewModel.cs" />
     <Compile Include="ViewModel\GuiTypeViewModel.cs" />
