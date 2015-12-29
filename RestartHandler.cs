@@ -26,6 +26,16 @@ namespace Cider_x64
         }
         public virtual void OnFsChange(string fsChangeFullPath)
         {
+            if (m_IsLoadingInProgress)
+            {
+                m_IsAutoRestartPossible = false;
+                if (IsAutoRestartPossibleChanged != null)
+                    IsAutoRestartPossibleChanged(this, EventArgs.Empty);
+            }
+
+            if (!m_IsAutoRestartPossible)
+                return;
+
             if (Path.GetDirectoryName(fsChangeFullPath) == m_WatchedFoler)
             {
                 if (!_restartPending)
@@ -39,9 +49,28 @@ namespace Cider_x64
             m_AppRestarter.Restart();
         }
 
+        bool m_IsLoadingInProgress;
+        public void OnLoadingBegin()
+        {
+            m_IsLoadingInProgress = true;
+        }
+        public void OnLoadingEnd()
+        {
+            m_IsLoadingInProgress = false;
+        }
+
+        bool m_IsAutoRestartPossible = true;
+        public bool IsAutoRestartPossible()
+        {
+            return m_IsAutoRestartPossible;
+        }
+
+        public event EventHandler IsAutoRestartPossibleChanged;
+
         public virtual void Dispose()
         {
-            (m_FsWatcherProxyToUse as IDisposable).Dispose();
+            if (m_FsWatcherProxyToUse != null)
+                (m_FsWatcherProxyToUse as IDisposable).Dispose();
         }
     }
 }

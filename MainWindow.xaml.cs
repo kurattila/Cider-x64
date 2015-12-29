@@ -101,6 +101,8 @@ namespace Cider_x64
                 if (!string.IsNullOrEmpty(assemblyDirectory))
                     Directory.SetCurrentDirectory(assemblyDirectory);
 
+                m_RestartHandler.OnLoadingBegin();
+
                 m_Loader = m_LoaderFactory.Create();
 
                 // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
@@ -119,6 +121,8 @@ namespace Cider_x64
 
                 m_SwitcherOfLoadedType.Loader = m_Loader;
                 ChangeType(m_Project.TypeOfPreviewedGui);
+
+                m_RestartHandler.OnLoadingEnd();
             }
         }
 
@@ -171,6 +175,7 @@ namespace Cider_x64
                 viewModel.SelectedAssembly = m_Project.AssemblyOfPreviewedGui;
                 viewModel.FileMenuItems = m_Project.GetFileMenuItemsCollection();
             }
+            viewModel.SetRestartHandler(m_RestartHandler);
         }
 
         /// <summary>

@@ -70,6 +70,36 @@ namespace Cider_x64.UnitTests
             Assert.AreEqual(1, spyRestarter.CalledRestartsCount);
         }
 
+        [TestMethod]
+        public void FsChange_WontMakeRestart_WhenFsChangeDetectedDuringLoadingTime()
+        {
+            var dummyFsWatcherProxy = new Fake_FsWatcherProxy();
+            RestartHandler restartHandler = new RestartHandler();
+            var spyRestarter = new Fake_AppRestarter();
+            restartHandler.Init(spyRestarter, @"C:\watchedFolder", dummyFsWatcherProxy);
+
+            restartHandler.OnLoadingBegin();
+            restartHandler.OnFsChange(@"C:\watchedFolder\abc.dll");
+
+            Assert.AreEqual(0, spyRestarter.CalledRestartsCount);
+        }
+
+        [TestMethod]
+        public void FsChange_WontMakeRestart_WhenFsChangeDetectedBothDuringAndAfterLoadingTime()
+        {
+            var dummyFsWatcherProxy = new Fake_FsWatcherProxy();
+            RestartHandler restartHandler = new RestartHandler();
+            var spyRestarter = new Fake_AppRestarter();
+            restartHandler.Init(spyRestarter, @"C:\watchedFolder", dummyFsWatcherProxy);
+
+            restartHandler.OnLoadingBegin();
+            restartHandler.OnFsChange(@"C:\watchedFolder\abc.dll");
+            restartHandler.OnLoadingEnd();
+            restartHandler.OnFsChange(@"C:\watchedFolder\abc.dll");
+
+            Assert.AreEqual(0, spyRestarter.CalledRestartsCount);
+        }
+
         class Fake_FsWatcherProxy : IFsWatcherProxy, IDisposable
         {
             public bool CalledDispose = false;
@@ -144,6 +174,71 @@ namespace Cider_x64.UnitTests
             }
 
             Assert.AreEqual(@"C:\dummyFolder\abc.dll", spyRestartHandler.CalledFsChangeFullPath);
+        }
+
+        [TestMethod]
+        public void IsAutoRestartPossible_ReturnsTrue_ByDefault()
+        {
+            bool autoRestartPossible = false;
+            using (RestartHandler restartHandler = new RestartHandler())
+            {
+                autoRestartPossible = restartHandler.IsAutoRestartPossible();
+            }
+
+            Assert.IsTrue(autoRestartPossible);
+        }
+
+        [TestMethod]
+        public void IsAutoRestartPossible_ReturnsFalse_WhenFsChangeDetectedDuringLoadingTime()
+        {
+            RestartHandler restartHandler = new RestartHandler();
+            restartHandler.OnLoadingBegin();
+
+            restartHandler.OnFsChange(@"dummyPath.dll");
+
+            Assert.IsFalse(restartHandler.IsAutoRestartPossible());
+            restartHandler.Dispose();
+        }
+
+        [TestMethod]
+        public void IsAutoRestartPossible_ReturnsTrue_WhenFsChangeDetectedOnlyAfterLoadingTime()
+        {
+            RestartHandler restartHandler = new RestartHandler();
+            restartHandler.OnLoadingBegin();
+            restartHandler.OnLoadingEnd();
+
+            restartHandler.OnFsChange(@"dummyPath.dll");
+
+            Assert.IsTrue(restartHandler.IsAutoRestartPossible());
+            restartHandler.Dispose();
+        }
+
+        [TestMethod]
+        public void IsAutoRestartPossible_ReturnsFalse_WhenFsChangeDetectedBothDuringAndAfterLoadingTime()
+        {
+            RestartHandler restartHandler = new RestartHandler();
+
+            restartHandler.OnLoadingBegin();
+            restartHandler.OnFsChange(@"dummyPath.dll");
+            restartHandler.OnLoadingEnd();
+            restartHandler.OnFsChange(@"dummyPath.dll");
+
+            Assert.IsFalse(restartHandler.IsAutoRestartPossible());
+            restartHandler.Dispose();
+        }
+
+        [TestMethod]
+        public void SettingIsAutoRestartPossible_WillFireIsAutoRestartPossibleChangedEvent_Always()
+        {
+            bool eventFired = false;
+            RestartHandler restartHandler = new RestartHandler();
+            restartHandler.IsAutoRestartPossibleChanged += (sender, args) => eventFired = true;
+
+            restartHandler.OnLoadingBegin();
+            restartHandler.OnFsChange(@"dummyPath.dll"); // shall fire IsAutoRestartPossibleChanged event
+
+            Assert.IsTrue(eventFired);
+            restartHandler.Dispose();
         }
     }
 }

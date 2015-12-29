@@ -75,6 +75,33 @@ namespace Cider_x64
             }
         }
 
+        RestartHandler m_RestartHandler;
+        public void SetRestartHandler(RestartHandler restartHandler)
+        {
+            m_RestartHandler = restartHandler;
+            m_RestartHandler.IsAutoRestartPossibleChanged += (sender, args) => refreshIsAutoRestartButtonShownState();
+            refreshIsAutoRestartButtonShownState();
+        }
+
+        void refreshIsAutoRestartButtonShownState()
+        {
+            IsManualRestartButtonShown = !m_RestartHandler.IsAutoRestartPossible();
+        }
+
+        bool m_IsManualRestartButtonShown;
+        public bool IsManualRestartButtonShown
+        {
+            get { return m_IsManualRestartButtonShown; }
+            set
+            {
+                if( m_IsManualRestartButtonShown != value)
+                {
+                    m_IsManualRestartButtonShown = value;
+                    NotifyPropertyChanged("IsManualRestartButtonShown");
+                }
+            }
+        }
+
         public void InitWithGuiTypes(List<string> guiTypes)
         {
             ListOfSelectedAssemblyTypes.Clear();

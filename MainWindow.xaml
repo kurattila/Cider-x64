@@ -10,6 +10,7 @@
         Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
         <Window.Resources>
             <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
+            <BooleanToVisibilityConverter x:Key="visibilityConverter" />
         </Window.Resources>
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
@@ -44,9 +45,10 @@
                 </MenuItem>
             </Menu>
 
-            <Button DockPanel.Dock="Bottom" 
+        <Button DockPanel.Dock="Bottom" Visibility="{Binding IsManualRestartButtonShown, Converter={StaticResource visibilityConverter}}"
                     Click="requestAppRestart" 
-                    Width="Auto">Restart</Button>
+                    ToolTip="Manual reload needed"
+                    Width="Auto">Reload now (several changes detected at once)</Button>
 
             <TextBlock DockPanel.Dock="Top" 
                        Margin="8,8,8,0" 
