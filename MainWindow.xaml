@@ -13,11 +13,11 @@
             <BooleanToVisibilityConverter x:Key="visibilityConverter" />
         </Window.Resources>
         <DockPanel LastChildFill="True">
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
+            <Menu DockPanel.Dock="Top" AutomationProperties.AutomationId="mainMenu">
+                <MenuItem Header="_File" AutomationProperties.AutomationId="fileMenuItem">
                     <MenuItem.ItemsSource>
                         <CompositeCollection>
-                            <MenuItem x:Name="miOpenFile" 
+                            <MenuItem x:Name="miOpenFile" AutomationProperties.AutomationId="fileOpenMenuItem"
                                   Header="_Open" 
                                   Command="{Binding ChangeAssemblyCommand}"
                                   />

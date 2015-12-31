@@ -18,7 +18,8 @@ namespace Cider_x64
 
             m_FsWatcherProxyToUse.SetChangedHandler(onFsChangeHandler);
             m_FsWatcherProxyToUse.Path = watchedFolder;
-            m_FsWatcherProxyToUse.EnableRaisingEvents = true;
+            if (!string.IsNullOrEmpty(watchedFolder))
+                m_FsWatcherProxyToUse.EnableRaisingEvents = true;
         }
         void onFsChangeHandler(object sender, FileSystemEventArgs args)
         {

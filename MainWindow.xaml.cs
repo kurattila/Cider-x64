@@ -60,9 +60,26 @@ namespace Cider_x64
                 this.Height = m_WindowConfig.Height;
             }
 
-            m_RestartHandler.Init(new AppRestarter(), Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui));
+            m_RestartHandler.Init(new AppRestarter(), getDirectory(m_Project.AssemblyOfPreviewedGui));
+            m_RestartHandler.OnLoadingBegin();
 
             InitializeViewModel();
+        }
+
+        string getDirectory(string fullPathOfAssembly)
+        {
+            string directory = "";
+
+            try
+            {
+                directory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
+            }
+            catch(ArgumentException)
+            {
+                // Potentially bad project settings: e.g. assembly on that path doesn't exist
+            }
+
+            return directory;
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
@@ -94,16 +111,14 @@ namespace Cider_x64
             {
                 waitIndicator.BeginWaiting(Left, Top, ActualWidth, ActualHeight);
 
+                m_Loader = m_LoaderFactory.Create();
+
                 if (!File.Exists(m_Project.AssemblyOfPreviewedGui))
                     return;
 
                 string assemblyDirectory = Path.GetDirectoryName(m_Project.AssemblyOfPreviewedGui);
                 if (!string.IsNullOrEmpty(assemblyDirectory))
                     Directory.SetCurrentDirectory(assemblyDirectory);
-
-                m_RestartHandler.OnLoadingBegin();
-
-                m_Loader = m_LoaderFactory.Create();
 
                 // Assemblies referenced from XAML through the "pack://application" syntax need to be loaded
                 foreach (string assemblyToPreload in m_Project.PreloadedAssemblies)

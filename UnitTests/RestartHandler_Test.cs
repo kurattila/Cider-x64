@@ -151,7 +151,7 @@ namespace Cider_x64.UnitTests
         }
 
         [TestMethod]
-        public void Init_WillEnableRaisingEventsOfFsWatcherProxy_Always()
+        public void Init_WillEnableRaisingEventsOfFsWatcherProxy_WhenFolderPathToWatchNotEmpty()
         {
             var spyFsWatcherProxy = new Fake_FsWatcherProxy();
             RestartHandler restartHandler = new RestartHandler();
@@ -160,6 +160,18 @@ namespace Cider_x64.UnitTests
             }
 
             Assert.IsTrue(spyFsWatcherProxy.EnableRaisingEvents);
+        }
+
+        [TestMethod]
+        public void Init_WontEnableRaisingEventsOfFsWatcherProxy_WhenFolderPathToWatchEmpty()
+        {
+            var spyFsWatcherProxy = new Fake_FsWatcherProxy();
+            RestartHandler restartHandler = new RestartHandler();
+            {
+                restartHandler.Init(null, "", spyFsWatcherProxy);
+            }
+
+            Assert.IsFalse(spyFsWatcherProxy.EnableRaisingEvents);
         }
 
         [TestMethod]
