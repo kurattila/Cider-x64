@@ -1,13 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Cider_x64.GuiTests.Screens;
-using TestStack.White.Configuration;
 using TestStack.White.Factory;
-using TestStack.White.Sessions;
 using System.IO;
-using System.Reflection;
-using TestStack.White.UIItems.WindowItems;
-using TestStack.White.UIItems.Finders;
+using TestStack.White.ScreenObjects;
 using System.Linq;
 
 namespace Cider_x64.GuiTests
@@ -18,11 +14,9 @@ namespace Cider_x64.GuiTests
         [TestMethod]
         public void AppStartup_WontCrash_WhenRegistryEmpty()
         {
-            Window mainWindow = Application.GetWindow("Cider x64");
-            var menubar = mainWindow.GetMenuBar(SearchCriteria.ByAutomationId("mainMenu"));
-            var fileMenu = menubar.MenuItemBy(SearchCriteria.ByAutomationId("fileMenuItem"));
+            var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
 
-            Assert.AreEqual(1, fileMenu.ChildMenus.Count); // "Open" item only - for a clean installation
+            Assert.AreEqual(1, mainWindow.FileMenuChildItems.Count); // "Open" item only - for a clean installation
         }
 
         [TestMethod]
@@ -32,8 +26,10 @@ namespace Cider_x64.GuiTests
             string ciderx64ExePath = Application.Process.StartInfo.FileName;
             string sampleGuiDllPath = Path.Combine(Path.GetDirectoryName(ciderx64ExePath), @"Cider-x64.SampleGuiElements.dll");
 
-            var fileOpenDialog = ShowFileOpenDialog();
-            SetFileIntoFileOpenDialog(fileOpenDialog, sampleGuiDllPath);
+            var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
+            var fileOpenDialog = mainWindow.ShowFileOpenDialog();
+            fileOpenDialog.FilePath = sampleGuiDllPath;
+            fileOpenDialog.ClickOk();
             WaitUntilAppExited();
 
             ReconnectAfterRestart();
@@ -46,8 +42,10 @@ namespace Cider_x64.GuiTests
         {
             string ciderx64ExePath = Application.Process.StartInfo.FileName;
             string sampleGuiDllPath = Path.Combine(Path.GetDirectoryName(ciderx64ExePath), @"Cider-x64.SampleGuiElements.dll");
-            var fileOpenDialog = ShowFileOpenDialog();
-            SetFileIntoFileOpenDialog(fileOpenDialog, sampleGuiDllPath);
+            var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
+            var fileOpenDialog = mainWindow.ShowFileOpenDialog();
+            fileOpenDialog.FilePath = sampleGuiDllPath;
+            fileOpenDialog.ClickOk();
             WaitUntilAppExited();
             ReconnectAfterRestart();
             int processIdBeforeRestart = Application.Process.Id;
