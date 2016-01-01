@@ -64,6 +64,9 @@ namespace Cider_x64.GuiTests
 
         void touchFileRepeatedly(string filePath, int repetitionsCount)
         {
+            // How to do the same from a command prompt:
+            // for /L %A in (1,1,200) do (echo %A & copy Wpf_AnimationD.dll /B+ ,,/Y)
+
             for (int i = 0; i < repetitionsCount; i++)
             {
                 try

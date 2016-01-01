@@ -8,64 +8,66 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
-        <Window.Resources>
-            <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
-            <BooleanToVisibilityConverter x:Key="visibilityConverter" />
-        </Window.Resources>
-        <DockPanel LastChildFill="True">
-            <Menu DockPanel.Dock="Top" AutomationProperties.AutomationId="mainMenu">
-                <MenuItem Header="_File" AutomationProperties.AutomationId="fileMenuItem">
-                    <MenuItem.ItemsSource>
-                        <CompositeCollection>
-                            <MenuItem x:Name="miOpenFile" AutomationProperties.AutomationId="fileOpenMenuItem"
-                                  Header="_Open" 
-                                  Command="{Binding ChangeAssemblyCommand}"
-                                  />
-                            <CollectionContainer Collection="{Binding Source={StaticResource mruAssemblies}}" />
-                        </CompositeCollection>
-                    </MenuItem.ItemsSource>
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Setter Property="MenuItem.Header" Value="{Binding Title}"/>
-                            <Setter Property="MenuItem.Command" Value="{Binding Path=DataContext.MruFileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
-                            <Setter Property="MenuItem.CommandParameter" Value="{Binding .}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate>
-                                            <Separator />
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                </MenuItem>
-            </Menu>
+    <Window.Resources>
+        <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
+        <BooleanToVisibilityConverter x:Key="visibilityConverter" />
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" AutomationProperties.AutomationId="mainMenu">
+            <MenuItem Header="_File" AutomationProperties.AutomationId="fileMenuItem">
+                <MenuItem.ItemsSource>
+                    <CompositeCollection>
+                        <MenuItem x:Name="miOpenFile" AutomationProperties.AutomationId="fileOpenMenuItem"
+                                Header="_Open" 
+                                Command="{Binding ChangeAssemblyCommand}"
+                                />
+                        <CollectionContainer Collection="{Binding Source={StaticResource mruAssemblies}}" />
+                    </CompositeCollection>
+                </MenuItem.ItemsSource>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="MenuItem.Header" Value="{Binding Title}"/>
+                        <Setter Property="MenuItem.Command" Value="{Binding Path=DataContext.MruFileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                        <Setter Property="MenuItem.CommandParameter" Value="{Binding .}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Separator />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+        </Menu>
+        <DockPanel LastChildFill="True" Margin="8">
 
-        <Button DockPanel.Dock="Bottom" Visibility="{Binding IsManualRestartButtonShown, Converter={StaticResource visibilityConverter}}"
+            <Button DockPanel.Dock="Bottom"
+                    Margin="0,8,0,0"
+                    Visibility="{Binding IsManualRestartButtonShown, Converter={StaticResource visibilityConverter}}"
                     Click="requestAppRestart" 
                     ToolTip="Manual reload needed"
                     Width="Auto">Reload now (several changes detected at once)</Button>
 
             <TextBlock DockPanel.Dock="Top" 
-                       Margin="8,8,8,0" 
-                       Text="Selected assembly :" />
+                        Text="Selected assembly :" />
 
             <TextBlock DockPanel.Dock="Top" 
-                       Margin="8,2,8,0"  
-                       Text="{Binding SelectedAssembly}" />
+                        Margin="0,2,0,0"  
+                        Text="{Binding SelectedAssembly}" />
 
             <TextBlock DockPanel.Dock="Top" 
-                       Margin="8,8,8,0" 
-                       Text="GUI types for preview :" />
+                        Margin="0,8,0,0" 
+                        Text="GUI types for preview :" />
 
             <ListBox x:Name="lbDllItemsList" 
-                     DockPanel.Dock="Top" 
-                     Margin="8"
-                     ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
+                        DockPanel.Dock="Top" 
+                        Margin="0,8,0,0"
+                        ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -76,9 +78,9 @@
                     <DataTemplate DataType="local:GuiTypeViewModel">
                         <DockPanel LastChildFill="True" >
                             <local:PlayStopButton x:Name="showButton" DockPanel.Dock="Left"
-                                                  Command="{Binding ShowCommand}"
-                                                  CommandParameter="{Binding NamespaceDotType}"
-                                                  IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
+                                                    Command="{Binding ShowCommand}"
+                                                    CommandParameter="{Binding NamespaceDotType}"
+                                                    IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
                             <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
                         </DockPanel>
                         <DataTemplate.Triggers>
@@ -97,8 +99,9 @@
                         </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-                
             </ListBox>
 
         </DockPanel>
+        
+    </DockPanel>
 </Window>
