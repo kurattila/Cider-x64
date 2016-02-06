@@ -70,6 +70,8 @@
     <Compile Include="MissingPreloadException_Test.cs" />
     <Compile Include="SwitcherOfLoadedType_Test.cs" />
     <Compile Include="RestartHandler_Test.cs" />
+    <Compile Include="StartupTaskFactory_Test.cs" />
+    <Compile Include="StartupTasks_Test.cs" />
     <Compile Include="WaitIndicator_Test.cs" />
     <Compile Include="WindowConfiguration_Test.cs" />
   </ItemGroup>

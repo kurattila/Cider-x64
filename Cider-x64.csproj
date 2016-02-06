@@ -74,6 +74,7 @@
     <Compile Include="MissingPreloadException.cs" />
     <Compile Include="PlayStopButton.cs" />
     <Compile Include="RestartHandler.cs" />
+    <Compile Include="StartupTasks.cs" />
     <Compile Include="SwitcherOfLoadedType.cs" />
     <Compile Include="ViewModel\FileMenuItemViewModel.cs" />
     <Compile Include="ViewModel\GuiTypeViewModel.cs" />
@@ -128,6 +129,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="WebService\Cider-x64-CheckNewVersion.php" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -140,6 +142,7 @@
   <ItemGroup>
     <Resource Include="Cider-x64_AppIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

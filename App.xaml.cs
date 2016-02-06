@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -22,6 +18,13 @@ namespace Cider_x64
         {
             MessageBox.Show(InnermostExceptionExtractor.GetInnermostMessage(e.Exception));
             e.Handled = true;
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            IStartupTask startupTask = StartupTaskFactory.CreateStartupTask(e.Args);
+            var startupBackgroundTask = new Action(() => startupTask.Run());
+            Task.Run(startupBackgroundTask);
         }
     }
 }

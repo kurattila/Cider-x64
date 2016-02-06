@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using TestStack.White;
 using TestStack.White.ScreenObjects;
+using System.Diagnostics;
 
 namespace Cider_x64.GuiTests.Screens
 {
@@ -22,8 +23,12 @@ namespace Cider_x64.GuiTests.Screens
             directoryName = Path.GetFullPath(directoryName + @"\..");
             directoryName = Path.GetFullPath(directoryName + @"\..");
             directoryName = Path.GetFullPath(directoryName + @"\..");
-            var markpadLocation = Path.GetFullPath(directoryName + @"\bin\x64\Debug\Cider-x64.exe");
-            Application = Application.Launch(markpadLocation);
+            var ciderLocation = Path.GetFullPath(directoryName + @"\bin\x64\Debug\Cider-x64.exe");
+
+            ProcessStartInfo info = new ProcessStartInfo(ciderLocation, "/nocheckversion"); // avoid making HTTP request on each UI test run
+            Process ciderProcess = Process.Start(info);
+
+            Application = Application.Attach(ciderProcess);
             ScreenRepository = new ScreenRepository(Application.ApplicationSession);
         }
 
