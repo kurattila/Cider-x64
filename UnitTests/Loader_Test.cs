@@ -16,11 +16,15 @@ namespace Cider_x64.UnitTests
         { }
 
         public bool ForceAssemblyNotFound = false;
+        public bool ForceBadImageFormatException = false;
         public List<AssemblyWrapper> LoadedAssemblies = new List<AssemblyWrapper>();
         protected override AssemblyWrapper loadAssembly(string assemblyPath)
         {
             if (ForceAssemblyNotFound)
                 throw new System.IO.FileNotFoundException();
+
+            if (ForceBadImageFormatException)
+                throw new System.BadImageFormatException();
 
             var wrapper = new AssemblyWrapper() { Path = assemblyPath, Assembly = null };
             LoadedAssemblies.Add(wrapper);
@@ -187,6 +191,18 @@ namespace Cider_x64.UnitTests
             string assemblyPath = @"\somePath\dummyAssembly.dll";
 
             loader.ForceAssemblyNotFound = true;
+            loader.LoadAssembly(assemblyPath);
+
+            // Implicit assert: exception thrown by Show() would make this test fail
+        }
+
+        [TestMethod]
+        public void LoadAssembly_WillHandleBadImageFormatException_WhenAssemblyIsNotManagedDll()
+        {
+            var loader = new Fake_Loader();
+            string assemblyPath = @"\somePath\dummyAssembly.dll";
+
+            loader.ForceBadImageFormatException = true;
             loader.LoadAssembly(assemblyPath);
 
             // Implicit assert: exception thrown by Show() would make this test fail

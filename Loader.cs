@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -135,7 +136,13 @@ namespace Cider_x64
             }
             catch(FileNotFoundException)
             {
+                m_LoadedAssemblyTypes = new List<string>();
                 return; // wrong assembly path specified
+            }
+            catch (BadImageFormatException)
+            {
+                m_LoadedAssemblyTypes = new List<string>();
+                return; // not a .NET dll?
             }
 
             m_LoadedAssemblyTypes = getValidAssemblyTypeNames(m_AssemblyWrapper);

@@ -64,42 +64,45 @@
                         Margin="0,8,0,0" 
                         Text="GUI types for preview :" />
 
-            <ListBox x:Name="lbDllItemsList" 
-                        DockPanel.Dock="Top" 
-                        Margin="0,8,0,0"
-                        ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="local:GuiTypeViewModel">
-                        <DockPanel LastChildFill="True" >
-                            <local:PlayStopButton x:Name="showButton" DockPanel.Dock="Left"
-                                                    Command="{Binding ShowCommand}"
-                                                    CommandParameter="{Binding NamespaceDotType}"
-                                                    IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
-                            <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
-                        </DockPanel>
-                        <DataTemplate.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="False" />
-                                    <Condition Binding="{Binding IsShown}" Value="False" />
-                                </MultiDataTrigger.Conditions>
-                            <MultiDataTrigger.Setters>
-                                <Setter TargetName="showButton" Property="Visibility" Value="Hidden"/>
-                            </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                            <DataTrigger Binding="{Binding IsShown}" Value="True">
-                                <Setter TargetName="guiTypeName" Property="Foreground" Value="Blue"/>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Grid DockPanel.Dock="Top" Margin="0,8,0,0">
+                <ListBox x:Name="lbDllItemsList" 
+                            ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="local:GuiTypeViewModel">
+                            <DockPanel LastChildFill="True" >
+                                <local:PlayStopButton x:Name="showButton" DockPanel.Dock="Left"
+                                                        Command="{Binding ShowCommand}"
+                                                        CommandParameter="{Binding NamespaceDotType}"
+                                                        IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
+                                <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
+                            </DockPanel>
+                            <DataTemplate.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="False" />
+                                        <Condition Binding="{Binding IsShown}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="showButton" Property="Visibility" Value="Hidden"/>
+                                </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                                <DataTrigger Binding="{Binding IsShown}" Value="True">
+                                    <Setter TargetName="guiTypeName" Property="Foreground" Value="Blue"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Text="{Binding TextualInfoForAssemblyTypes, FallbackValue=No WPF GUI types}" FontSize="18" Foreground="LightGray"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" >
+                </TextBlock>
+            </Grid>
 
         </DockPanel>
         

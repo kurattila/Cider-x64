@@ -72,6 +72,7 @@
     <Compile Include="RestartHandler_Test.cs" />
     <Compile Include="StartupTaskFactory_Test.cs" />
     <Compile Include="StartupTasks_Test.cs" />
+    <Compile Include="MainViewModel_Test.cs" />
     <Compile Include="WaitIndicator_Test.cs" />
     <Compile Include="WindowConfiguration_Test.cs" />
   </ItemGroup>

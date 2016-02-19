@@ -9,6 +9,15 @@ namespace Cider_x64
 {
     class MainViewModel : Helpers.ObservableBase
     {
+        public MainViewModel()
+        {
+            ListOfSelectedAssemblyTypes.CollectionChanged += ListOfSelectedAssemblyTypes_CollectionChanged;
+        }
+
+        private void ListOfSelectedAssemblyTypes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifyPropertyChanged("TextualInfoForAssemblyTypes");
+        }
 
         #region SelectedAssembly
         /// <summary>
@@ -22,6 +31,7 @@ namespace Cider_x64
             {
                 m_SelectedAssembly = value;
                 this.NotifyPropertyChanged("SelectedAssembly");
+                this.NotifyPropertyChanged("TextualInfoForAssemblyTypes");
             }
         }
         private String m_SelectedAssembly;
@@ -54,12 +64,35 @@ namespace Cider_x64
             get { return m_ListOfSelectedAssemblyTypes; }
             set
             {
-                m_ListOfSelectedAssemblyTypes = value;
-                this.NotifyPropertyChanged("ListOfSelectedAssemblyTypes");
+                if (value != m_ListOfSelectedAssemblyTypes)
+                {
+                    m_ListOfSelectedAssemblyTypes.CollectionChanged -= ListOfSelectedAssemblyTypes_CollectionChanged;
+                    m_ListOfSelectedAssemblyTypes = value;
+                    m_ListOfSelectedAssemblyTypes.CollectionChanged += ListOfSelectedAssemblyTypes_CollectionChanged;
+                    this.NotifyPropertyChanged("ListOfSelectedAssemblyTypes");
+                    this.NotifyPropertyChanged("TextualInfoForAssemblyTypes");
+                }
             }
         }
         private ObservableCollection<GuiTypeViewModel> m_ListOfSelectedAssemblyTypes = new ObservableCollection<GuiTypeViewModel>();
         #endregion
+
+        public static string NoAssemblyLoadedYet = "No assembly loaded yet";
+        public static string NoGuiTypesInAssembly = "No GUI types in assembly";
+
+        public string TextualInfoForAssemblyTypes
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(SelectedAssembly))
+                    return MainViewModel.NoAssemblyLoadedYet;
+
+                if (ListOfSelectedAssemblyTypes.Count > 0)
+                    return "";
+                else
+                    return MainViewModel.NoGuiTypesInAssembly;
+            }
+        }
 
         ObservableCollection<FileMenuItemViewModel> m_FileMenuItems;
         public ObservableCollection<FileMenuItemViewModel> FileMenuItems
