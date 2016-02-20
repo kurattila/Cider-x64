@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cider_x64
 {
-    interface IFsWatcherProxy
+    public interface IFsWatcherProxy
     {
         string Path { get; set; }
         void SetChangedHandler(FileSystemEventHandler handler);

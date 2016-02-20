@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Cider_x64"
         xmlns:acb="clr-namespace:Cider_x64.Helpers.AttachedCommandBehavior"
+        xmlns:helpers="clr-namespace:Cider_x64.Helpers"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
@@ -79,7 +80,12 @@
                                 <local:PlayStopButton x:Name="showButton" DockPanel.Dock="Left"
                                                         Command="{Binding ShowCommand}"
                                                         CommandParameter="{Binding NamespaceDotType}"
-                                                        IsChecked="{Binding IsShown, Mode=OneWay}" >Show</local:PlayStopButton>
+                                                        IsChecked="{Binding IsShown, Mode=OneWay}"
+                                                        acb:CommandBehavior.Event="MouseEnter"
+                                                        acb:CommandBehavior.Command="{Binding UpdateCurrentShowButtonCoordsCommand}"
+                                                        acb:CommandBehavior.CommandParameter="{Binding Path=., ElementName=showButton}">
+                                    Show
+                                </local:PlayStopButton>
                                 <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
                             </DockPanel>
                             <DataTemplate.Triggers>

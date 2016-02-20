@@ -4,14 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cider_x64
 {
-    class MainViewModel : Helpers.ObservableBase
+    public class MainViewModel : Helpers.ObservableBase
     {
         public MainViewModel()
         {
             ListOfSelectedAssemblyTypes.CollectionChanged += ListOfSelectedAssemblyTypes_CollectionChanged;
+            PlayButtonWaitIndicatorAppearance = new PlayButtonWaitIndicatorAppearance();
         }
 
         private void ListOfSelectedAssemblyTypes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -135,16 +138,60 @@ namespace Cider_x64
             }
         }
 
+        [ExcludeFromCodeCoverage]
+        protected virtual GuiTypeViewModel createGuiTypeViewModelInstance()
+        {
+            return new GuiTypeViewModel();
+        }
+
         public void InitWithGuiTypes(List<string> guiTypes)
         {
             ListOfSelectedAssemblyTypes.Clear();
 
             foreach(string namespaceDotType in guiTypes)
             {
-                var vm = new GuiTypeViewModel() { NamespaceDotType = namespaceDotType, IsShown = false };
-                vm.ShowCommand = new RelayCommand((param) => { ChangeTypeCommand.Execute(param); });
+                var vm = createGuiTypeViewModelInstance();
+                vm.NamespaceDotType = namespaceDotType;
+                vm.IsShown = false;
+                vm.ShowCommand = new RelayCommand(onShowCommand);
+
                 ListOfSelectedAssemblyTypes.Add(vm);
             }
+        }
+
+        void onShowCommand(object param)
+        {
+            //m_WaitIndicator.BeginWaiting(0, 0, 0, 0);
+            //ChangeTypeCommand.Execute(param);
+
+            //if (param is string)
+            //{
+            string namespaceDotType = param as string;
+            var vmOfShownGuiType = (from vm in ListOfSelectedAssemblyTypes
+                                    where vm.NamespaceDotType == namespaceDotType
+                                    select vm).FirstOrDefault();
+            if (vmOfShownGuiType != null)
+            {
+                m_WaitIndicator.BeginWaiting(
+                      PlayButtonWaitIndicatorAppearance
+                    , vmOfShownGuiType.CurrentHilitedShowButtonRect.Left
+                    , vmOfShownGuiType.CurrentHilitedShowButtonRect.Top
+                    , vmOfShownGuiType.CurrentHilitedShowButtonRect.Width
+                    , vmOfShownGuiType.CurrentHilitedShowButtonRect.Height);
+
+                ChangeTypeCommand.Execute(param);
+
+                m_WaitIndicator.EndWaiting();
+            }
+            //}
+        }
+
+        public IWaitIndicatorAppearance PlayButtonWaitIndicatorAppearance { get; set; }
+
+        WaitIndicator m_WaitIndicator;
+        public void SetWaitIndicator(WaitIndicator waitIndicator)
+        {
+            m_WaitIndicator = waitIndicator;
         }
 
         #region Commands

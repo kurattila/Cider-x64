@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Cider_x64.UnitTests
 {
@@ -10,8 +11,9 @@ namespace Cider_x64.UnitTests
         public void BeginWaiting_WillShowWindow_Always()
         {
             var waitIndicator = new Fake_WaitIndicator();
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
 
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             Assert.IsTrue(waitIndicator.CreatedWindow.CalledShow);
             waitIndicator.EndWaiting();
@@ -22,8 +24,9 @@ namespace Cider_x64.UnitTests
         {
             var waitIndicator = new Fake_WaitIndicator();
             int callerThreadId = Thread.CurrentThread.ManagedThreadId;
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
 
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             Assert.AreEqual(ApartmentState.STA, waitIndicator.CreatedWindow.CalledShowApartmentState);
             Assert.AreNotEqual(callerThreadId, waitIndicator.CreatedWindow.CalledShowThreadId);
@@ -34,8 +37,9 @@ namespace Cider_x64.UnitTests
         public void BeginWaiting_WillShowWindowAtSpecifiedSizeAndPosition_Always()
         {
             var waitIndicator = new Fake_WaitIndicator();
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
 
-            waitIndicator.BeginWaiting(10, 20, 30, 40);
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 10, 20, 30, 40);
 
             Assert.AreEqual(10, waitIndicator.CreatedWindow.CalledShowLeft);
             Assert.AreEqual(20, waitIndicator.CreatedWindow.CalledShowTop);
@@ -48,7 +52,8 @@ namespace Cider_x64.UnitTests
         public void EndWaiting_WillCloseWindow_Always()
         {
             var waitIndicator = new Fake_WaitIndicator();
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             waitIndicator.EndWaiting();
 
@@ -60,7 +65,8 @@ namespace Cider_x64.UnitTests
         {
             int callerThreadId = Thread.CurrentThread.ManagedThreadId;
             var waitIndicator = new Fake_WaitIndicator();
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             waitIndicator.EndWaiting();
 
@@ -72,7 +78,8 @@ namespace Cider_x64.UnitTests
         {
             var waitIndicator = new Fake_WaitIndicator();
             waitIndicator.ForcedThreadExecutionMillisecs = 2000;
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             waitIndicator.EndWaiting();
 
@@ -84,7 +91,8 @@ namespace Cider_x64.UnitTests
         {
             var waitIndicator = new Fake_WaitIndicator();
             waitIndicator.ForcedThreadExecutionMillisecs = 2000;
-            waitIndicator.BeginWaiting(0, 0, 0, 0);
+            var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
+            waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
 
             waitIndicator.EndWaiting();
             waitIndicator.EndWaiting();
@@ -97,7 +105,8 @@ namespace Cider_x64.UnitTests
             using (waitIndicator = new Fake_WaitIndicator())
             {
                 waitIndicator.ForcedThreadExecutionMillisecs = 2000;
-                waitIndicator.BeginWaiting(0, 0, 0, 0);
+                var dummyAppearance = new Mock<IWaitIndicatorAppearance>();
+                waitIndicator.BeginWaiting(dummyAppearance.Object, 0, 0, 0, 0);
             }
 
             Assert.IsFalse(waitIndicator.IsThreadRunning);
@@ -122,7 +131,7 @@ namespace Cider_x64.UnitTests
         public double CalledShowTop { get; private set; }
         public double CalledShowWidth { get; private set; }
         public double CalledShowHeight { get; private set; }
-        public void Show(double left, double top, double width, double height)
+        public void Show(IWaitIndicatorAppearance appearance, double left, double top, double width, double height)
         {
             CalledShowThreadId = Thread.CurrentThread.ManagedThreadId;
             CalledShowApartmentState = Thread.CurrentThread.GetApartmentState();

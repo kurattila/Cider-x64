@@ -109,7 +109,7 @@ namespace Cider_x64
         {
             using (var waitIndicator = new WaitIndicator())
             {
-                waitIndicator.BeginWaiting(Left, Top, ActualWidth, ActualHeight);
+                waitIndicator.BeginWaiting(new MainWindowWaitIndicatorAppearance(), Left, Top, ActualWidth, ActualHeight);
 
                 m_Loader = m_LoaderFactory.Create();
 
@@ -177,6 +177,7 @@ namespace Cider_x64
                 vm.ChangeTypeCommand = new Helpers.RelayCommand((param) => ChangeType(param));
                 vm.MruFileCommand = new Helpers.RelayCommand((param) => ChangeAssembly((param as ViewModel.FileMenuItemViewModel).Title));
                 m_SwitcherOfLoadedType.MainViewModel = vm;
+                vm.SetWaitIndicator(new WaitIndicator());
             }
         }
 

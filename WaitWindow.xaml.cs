@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Cider_x64
@@ -58,12 +59,13 @@ namespace Cider_x64
             base.Close();
         }
 
-        public void Show(double left, double top, double width, double height)
+        public void Show(IWaitIndicatorAppearance appearance, double left, double top, double width, double height)
         {
             this.Left = left;
             this.Top = top;
             this.Width = width;
             this.Height = height;
+            m_ViewModel.Appearance = appearance; // determine "appearance" yet before Show()
             Show();
 
             m_ViewModel.WaitWindowVisualState = "Active";
@@ -73,6 +75,8 @@ namespace Cider_x64
     public class WaitWindowViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public IWaitIndicatorAppearance Appearance { get; set; }
 
         string m_WaitWindowVisualState;
         public string WaitWindowVisualState
@@ -87,6 +91,16 @@ namespace Cider_x64
                         PropertyChanged(this, new PropertyChangedEventArgs("WaitWindowVisualState"));
                 }
             }
+        }
+
+        public double CircleSize
+        {
+            get { return Appearance.CircleSize; }
+        }
+
+        public Brush Background
+        {
+            get { return Appearance.Background; }
         }
     }
 }

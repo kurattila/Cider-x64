@@ -73,6 +73,8 @@
     <Compile Include="StartupTaskFactory_Test.cs" />
     <Compile Include="StartupTasks_Test.cs" />
     <Compile Include="MainViewModel_Test.cs" />
+    <Compile Include="FrameworkElementToWin32CoordsConverter_Test.cs" />
+    <Compile Include="GuiTypeViewModel_Test.cs" />
     <Compile Include="WaitIndicator_Test.cs" />
     <Compile Include="WindowConfiguration_Test.cs" />
   </ItemGroup>

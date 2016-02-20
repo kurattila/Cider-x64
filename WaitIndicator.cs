@@ -1,14 +1,47 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Cider_x64
 {
+    public interface IWaitIndicatorAppearance
+    {
+        double CircleSize { get; }
+        Brush Background { get; }
+    }
+
+    public class MainWindowWaitIndicatorAppearance : IWaitIndicatorAppearance
+    {
+        public Brush Background
+        {
+            get { return Brushes.Black; }
+        }
+
+        public double CircleSize
+        {
+            get { return 50; }
+        }
+    }
+
+    public class PlayButtonWaitIndicatorAppearance : IWaitIndicatorAppearance
+    {
+        public Brush Background
+        {
+            get { return Brushes.Transparent; }
+        }
+
+        public double CircleSize
+        {
+            get { return 15; }
+        }
+    }
+
     /// <summary>
     /// Inspired by https://strukachev.wordpress.com/2011/01/09/wpf-progress-window-in-separate-thread/
     /// </summary>
-    internal class WaitIndicator : IDisposable
+    public class WaitIndicator : IDisposable
     {
         private Thread m_BackgroundGuiThread;
         private AutoResetEvent m_WaitWindowShownEvent = new AutoResetEvent(false);
@@ -19,8 +52,11 @@ namespace Cider_x64
         double m_Height = 0;
 
         protected IWindow m_WaitWindow;
-        public void BeginWaiting(double left, double top, double width, double height)
+        private IWaitIndicatorAppearance m_WaitIndicatorAppearance;
+        public virtual void BeginWaiting(IWaitIndicatorAppearance appearance, double left, double top, double width, double height)
         {
+            m_WaitIndicatorAppearance = appearance;
+
             m_Left = left;
             m_Top = top;
             m_Width = width;
@@ -33,7 +69,7 @@ namespace Cider_x64
             m_WaitWindowShownEvent.WaitOne();
         }
 
-        public void EndWaiting()
+        public virtual void EndWaiting()
         {
             if (!IsBackgroundGuiThreadRunning())
                 return;
@@ -68,7 +104,7 @@ namespace Cider_x64
         protected virtual void doBackgroundGuiThreadWork()
         {
             m_WaitWindow = createWindow();
-            m_WaitWindow.Show(m_Left, m_Top, m_Width, m_Height);
+            m_WaitWindow.Show(m_WaitIndicatorAppearance, m_Left, m_Top, m_Width, m_Height);
             m_WaitWindowShownEvent.Set();
 
             Dispatcher dispatcher = m_WaitWindow.DispatcherInstance;

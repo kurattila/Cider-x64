@@ -69,6 +69,7 @@
     <Compile Include="Helpers\AttachedCommandBehavior\EventHandlerGenerator.cs" />
     <Compile Include="Helpers\AttachedCommandBehavior\ExecutionStrategy.cs" />
     <Compile Include="Helpers\AttachedCommandBehavior\SimpleCommand.cs" />
+    <Compile Include="Helpers\FrameworkElementToWin32CoordsConverter.cs" />
     <Compile Include="IWindow.cs" />
     <Compile Include="Helpers\VisualStateManager_Accessor.cs" />
     <Compile Include="MissingPreloadException.cs" />

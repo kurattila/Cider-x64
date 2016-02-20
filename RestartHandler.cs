@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Cider_x64
 {
-    class RestartHandler : IDisposable
+    public class RestartHandler : IDisposable
     {
         string m_WatchedFoler;
         AppRestarter m_AppRestarter;

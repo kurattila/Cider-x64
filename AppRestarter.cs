@@ -7,9 +7,9 @@ using System.Windows.Threading;
 
 namespace Cider_x64
 {
-    internal class AppRestarter
+    public class AppRestarter
     {
-        internal interface IDispatcherAccessor
+        public interface IDispatcherAccessor
         {
             void BeginInvoke(Action action, DispatcherPriority priority);
         }

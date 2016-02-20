@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace Cider_x64.ViewModel
 {
-    class FileMenuItemViewModel : Helpers.ObservableBase
+    public class FileMenuItemViewModel : Helpers.ObservableBase
     {
         string m_Title;
         public string Title

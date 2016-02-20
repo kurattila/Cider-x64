@@ -39,8 +39,8 @@
                 </BeginStoryboard>
             </EventTrigger>
         </Grid.Triggers>
-        <Grid x:Name="background" Background="Black" />
-        <Ellipse x:Name="progressCircle" Width="50" Height="50" StrokeThickness="7" >
+        <Grid x:Name="background" Background="{Binding Background}" />
+        <Ellipse x:Name="progressCircle" Width="{Binding CircleSize}" Height="{Binding CircleSize}" StrokeThickness="7" >
             <Ellipse.Stroke>
                 <LinearGradientBrush>
                     <GradientStopCollection>
