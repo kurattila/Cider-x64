@@ -16,6 +16,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// Defines a Command Binding
     /// This inherits from freezable so that it gets inheritance context for DataBinding to work
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class BehaviorBinding : Freezable
     {
         CommandBehaviorBinding behavior;

@@ -29,6 +29,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// An "event filter" class which lets through only mouse events of the _left_ mouse button
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     class EventFilter_LeftMouseButton : IEventFilter
     {
         // IEventFilter
@@ -41,6 +42,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// An "event filter" class which lets through only mouse events of the _left_ mouse button without Ctrl/Shift pressed
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     class EventFilter_LeftMouseButtonNoCtrlShift : IEventFilter
     {
         // IEventFilter
@@ -55,6 +57,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// An "event filter" class which lets through only key events of the "Enter" key
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     class EventFilter_EnterKey : IEventFilter
     {
         // IEventFilter
@@ -67,6 +70,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// Defines the attached properties to create a CommandBehaviorBinding
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class CommandBehavior
     {
         #region Behavior

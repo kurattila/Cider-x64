@@ -16,6 +16,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// Generates delegates according to the specified signature on runtime
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public static class EventHandlerGenerator
     {
         /// <summary>

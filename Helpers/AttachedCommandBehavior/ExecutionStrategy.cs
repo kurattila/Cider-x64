@@ -30,6 +30,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// Executes a command 
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class CommandExecutionStrategy : IExecutionStrategy
     {
         #region IExecutionStrategy Members
@@ -57,6 +58,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// executes a delegate
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class ActionExecutionStrategy : IExecutionStrategy
     {
 

@@ -15,6 +15,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// CommandBehaviorCollection class
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class CommandBehaviorCollection
     {
         #region Behaviors
@@ -114,6 +115,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// Collection to store the list of behaviors. This is done so that you can intiniate it from XAML
     /// This inherits from freezable so that it gets inheritance context for DataBinding to work
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class BehaviorBindingCollection : FreezableCollection<BehaviorBinding>
     {
         /// <summary>

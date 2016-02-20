@@ -14,6 +14,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// Implements the ICommand and wraps up all the verbose stuff so that you can just pass 2 delegates 1 for the CanExecute and one for the Execute
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class SimpleCommand : ICommand
     {
         /// <summary>

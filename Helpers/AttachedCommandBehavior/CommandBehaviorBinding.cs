@@ -17,6 +17,7 @@ namespace Cider_x64.Helpers.AttachedCommandBehavior
     /// <summary>
     /// Defines the command behavior binding
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // 3-rd party code
     public class CommandBehaviorBinding : IDisposable
     {
         #region Properties
