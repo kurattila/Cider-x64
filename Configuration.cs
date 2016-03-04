@@ -2,7 +2,7 @@
 
 namespace Cider_x64
 {
-    internal class Configuration
+    public class Configuration
     {
         public virtual void LoadSettings()
         {
@@ -59,7 +59,7 @@ namespace Cider_x64
         }
     }
 
-    internal class RegistryKeyWrapper
+    public class RegistryKeyWrapper
     {
         public string RegPath;
         public RegistryKey RegistryKey;

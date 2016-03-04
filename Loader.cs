@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 
 namespace Cider_x64
 {
-    internal class Loader : MarshalByRefObject, ILoader
+    internal class Loader : MarshalByRefObject
+                          , ILoader
+                          , IConfigurableWindow
     {
-        WindowConfiguration m_WindowConfig = new WindowConfiguration("PreviewWindow");
-
         static Loader()
         {
             DesignerProperties.IsInDesignModeProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.OverridesInheritanceBehavior | FrameworkPropertyMetadataOptions.Inherits));
@@ -65,28 +66,16 @@ namespace Cider_x64
 
         private void onSourceInitialized(object sender, EventArgs e)
         {
-            m_WindowConfig.LoadSettings();
-            if (m_WindowConfig.ValidSettings())
-            {
-                Window previewWindow = sender as Window;
-                previewWindow.Topmost = true;
-
-                previewWindow.Left = m_WindowConfig.Left;
-                previewWindow.Top = m_WindowConfig.Top;
-                previewWindow.Width = m_WindowConfig.Width;
-                previewWindow.Height = m_WindowConfig.Height;
-            }
+            if (ConfigurableWindowInitialized != null)
+                ConfigurableWindowInitialized(this, EventArgs.Empty);
         }
 
         private void onPreviewWindowClosed(object sender, EventArgs e)
         {
             Window previewWindow = sender as Window;
 
-            m_WindowConfig.Left = (int)previewWindow.Left;
-            m_WindowConfig.Top = (int)previewWindow.Top;
-            m_WindowConfig.Width = (int)previewWindow.Width;
-            m_WindowConfig.Height = (int)previewWindow.Height;
-            m_WindowConfig.SaveSettings();
+            if (ConfigurableWindowClosed != null)
+                ConfigurableWindowClosed(this, EventArgs.Empty);
 
             if (PreviewWindowClosed != null)
                 PreviewWindowClosed(this, new EventArgs());
@@ -220,6 +209,47 @@ namespace Cider_x64
 
             return list;
         }
+
+
+
+        ///================================================================================
+        /// IConfigurableWindow
+        ///================================================================================
+        [ExcludeFromCodeCoverage]
+        public void SetAlwaysOnTop(bool alwaysOnTop)
+        {
+            m_GuiPreviewer.PreviewerWindow.Topmost = alwaysOnTop;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public void SetPlacement(Rect windowRect)
+        {
+            m_GuiPreviewer.PreviewerWindow.Left = windowRect.Left;
+            m_GuiPreviewer.PreviewerWindow.Top = windowRect.Top;
+            m_GuiPreviewer.PreviewerWindow.Width = windowRect.Width;
+            m_GuiPreviewer.PreviewerWindow.Height = windowRect.Height;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public bool GetAlwaysOnTop()
+        {
+            return m_GuiPreviewer.PreviewerWindow.Topmost;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Rect GetPlacement()
+        {
+            return new Rect(m_GuiPreviewer.PreviewerWindow.Left, m_GuiPreviewer.PreviewerWindow.Top, m_GuiPreviewer.PreviewerWindow.Width, m_GuiPreviewer.PreviewerWindow.Height);
+        }
+
+        [ExcludeFromCodeCoverage]
+        public IConfigurableWindow GetConfigurableWindow()
+        {
+            return this;
+        }
+
+        public event EventHandler ConfigurableWindowInitialized;
+        public event EventHandler ConfigurableWindowClosed;
     }
 
     public struct AssemblyWrapper

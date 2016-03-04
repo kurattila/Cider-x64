@@ -17,13 +17,12 @@ namespace Cider_x64.GuiTests.Screens
         protected UITestBase()
         {
             backupRegistrySettings();
+        }
 
-            var directoryName = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath);
-            directoryName = Uri.UnescapeDataString(directoryName); // e.g. otherwise, spaces in the path of our .EXE would be represented as '%20'
-            directoryName = Path.GetFullPath(directoryName + @"\..");
-            directoryName = Path.GetFullPath(directoryName + @"\..");
-            directoryName = Path.GetFullPath(directoryName + @"\..");
-            var ciderLocation = Path.GetFullPath(directoryName + @"\bin\x64\Debug\Cider-x64.exe");
+        public void StartApp()
+        {
+            var binsPath = GetBinariesPath();
+            var ciderLocation = Path.GetFullPath(binsPath + "Cider-x64.exe");
 
             ProcessStartInfo info = new ProcessStartInfo(ciderLocation, "/nocheckversion"); // avoid making HTTP request on each UI test run
             Process ciderProcess = Process.Start(info);
@@ -34,9 +33,20 @@ namespace Cider_x64.GuiTests.Screens
 
         public void Dispose()
         {
-            Application.Dispose();
+            if (Application != null)
+                Application.Dispose();
 
             restoreRegistrySettingsFromBackup();
+        }
+
+        public string GetBinariesPath()
+        {
+            var directoryName = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath);
+            directoryName = Uri.UnescapeDataString(directoryName); // e.g. otherwise, spaces in the path of our .EXE would be represented as '%20'
+            directoryName = Path.GetFullPath(directoryName + @"\..");
+            directoryName = Path.GetFullPath(directoryName + @"\..");
+            directoryName = Path.GetFullPath(directoryName + @"\..");
+            return Path.GetFullPath(directoryName + @"\bin\x64\Debug\");
         }
 
         public void ReconnectAfterRestart()
@@ -65,13 +75,13 @@ namespace Cider_x64.GuiTests.Screens
         void backupRegistrySettings()
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"software", true /*writable*/);
-            Cider_x64.GuiTests.RegistryUtilities.RenameSubKey(rk, "Cider-x64", "Cider-x64.Backup");
+            Cider_x64.GuiTests.RegistryUtilities.RenameSubKey(rk, RegistryUtilities.RegistryKeyName, RegistryUtilities.RegistryBackupKeyName);
         }
 
         void restoreRegistrySettingsFromBackup()
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"software", true /*writable*/);
-            Cider_x64.GuiTests.RegistryUtilities.RenameSubKey(rk, "Cider-x64.Backup", "Cider-x64");
+            Cider_x64.GuiTests.RegistryUtilities.RenameSubKey(rk, RegistryUtilities.RegistryBackupKeyName, RegistryUtilities.RegistryKeyName);
         }
     }
 }

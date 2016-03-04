@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cider_x64
 {
@@ -12,20 +13,25 @@ namespace Cider_x64
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public sealed partial class MainWindow : Window
+                                           , IConfigurableWindow
                                            , IDisposable
     {
         LoaderConfiguration m_Project = new LoaderConfiguration();
-        WindowConfiguration m_WindowConfig = new WindowConfiguration("MainWindow");
 
+        ConfigurableWindowGuard m_ConfigurableWindowGuard = new ConfigurableWindowGuard();
         LoaderFactory m_LoaderFactory = new LoaderFactory();
         public MainWindow()
         {
+            var vm = new MainViewModel();
+            m_ConfigurableWindowGuard.Init(vm);
+            m_ConfigurableWindowGuard.RegisterConfigurableWindow(this, new WindowConfiguration("MainWindow"));
+
             Initialized += MainWindow_Initialized;
             Closed += MainWindow_Closed;
             StateChanged += MainWindow_StateChanged;
 
             this.DataContextChanged += new DependencyPropertyChangedEventHandler(MainViewDataContextChanged);
-            this.DataContext = new MainViewModel();
+            this.DataContext = vm;
 
             InitializeComponent();
 
@@ -51,14 +57,8 @@ namespace Cider_x64
             m_SwitcherOfLoadedType.LoaderConfiguration = m_Project;
             m_SwitcherOfLoadedType.MessageBoxOwner = this;
 
-            m_WindowConfig.LoadSettings();
-            if (m_WindowConfig.ValidSettings())
-            {
-                this.Left = m_WindowConfig.Left;
-                this.Top = m_WindowConfig.Top;
-                this.Width = m_WindowConfig.Width;
-                this.Height = m_WindowConfig.Height;
-            }
+            if (ConfigurableWindowInitialized != null)
+                ConfigurableWindowInitialized(this, EventArgs.Empty);
 
             m_RestartHandler.Init(new AppRestarter(), getDirectory(m_Project.AssemblyOfPreviewedGui));
             m_RestartHandler.OnLoadingBegin();
@@ -93,11 +93,8 @@ namespace Cider_x64
                 // preview window might have been closed already
             }
 
-            m_WindowConfig.Left = (int)Left;
-            m_WindowConfig.Top = (int)Top;
-            m_WindowConfig.Width = (int)Width;
-            m_WindowConfig.Height = (int)Height;
-            m_WindowConfig.SaveSettings();
+            if (ConfigurableWindowClosed != null)
+                ConfigurableWindowClosed(this, EventArgs.Empty);
 
             m_Project.SaveSettings();
         }
@@ -112,6 +109,7 @@ namespace Cider_x64
                 waitIndicator.BeginWaiting(new MainWindowWaitIndicatorAppearance(), Left, Top, ActualWidth, ActualHeight);
 
                 m_Loader = m_LoaderFactory.Create();
+                m_ConfigurableWindowGuard.RegisterConfigurableWindow(m_Loader.GetConfigurableWindow(), new WindowConfiguration("PreviewWindow"));
 
                 if (!File.Exists(m_Project.AssemblyOfPreviewedGui))
                     return;
@@ -192,6 +190,7 @@ namespace Cider_x64
                 viewModel.FileMenuItems = m_Project.GetFileMenuItemsCollection();
             }
             viewModel.SetRestartHandler(m_RestartHandler);
+            viewModel.IsTopMostMainWindow = this.Topmost;
         }
 
         /// <summary>
@@ -234,5 +233,40 @@ namespace Cider_x64
         {
             m_SwitcherOfLoadedType.ToggleType(type as string, waitIndicator);
         }
+
+
+
+        ///================================================================================
+        /// IConfigurableWindow
+        ///================================================================================
+        [ExcludeFromCodeCoverage]
+        public void SetAlwaysOnTop(bool alwaysOnTop)
+        {
+            this.Topmost = alwaysOnTop;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public void SetPlacement(Rect windowRect)
+        {
+            this.Left = windowRect.Left;
+            this.Top = windowRect.Top;
+            this.Width = windowRect.Width;
+            this.Height = windowRect.Height;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public bool GetAlwaysOnTop()
+        {
+            return Topmost;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Rect GetPlacement()
+        {
+            return new Rect(Left, Top, Width, Height);
+        }
+
+        public event EventHandler ConfigurableWindowInitialized;
+        public event EventHandler ConfigurableWindowClosed;
     }
 }

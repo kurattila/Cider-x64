@@ -58,6 +58,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppRestarter.cs" />
+    <Compile Include="ConfigurableWindowGuard.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="FsWatcherProxy.cs" />
     <Compile Include="GuiPreviewer.cs" />

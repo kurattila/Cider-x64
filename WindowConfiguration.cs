@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 namespace Cider_x64
 {
-    internal class WindowConfiguration : Configuration
+    public class WindowConfiguration : Configuration
     {
         string m_WindowId;
         public WindowConfiguration(string windowId)
@@ -12,6 +14,7 @@ namespace Cider_x64
             Top = WindowConfiguration.UndefinedValue;
             Width = WindowConfiguration.UndefinedValue;
             Height = WindowConfiguration.UndefinedValue;
+            IsTopMostWindow = true;
         }
 
         public override void LoadSettings()
@@ -24,6 +27,9 @@ namespace Cider_x64
             Top = (int)loadSingleSetting(regKeyWrapper, "Top", WindowConfiguration.UndefinedValue);
             Width = (int)loadSingleSetting(regKeyWrapper, "Width", WindowConfiguration.UndefinedValue);
             Height = (int)loadSingleSetting(regKeyWrapper, "Height", WindowConfiguration.UndefinedValue);
+
+            int isTopMostWindowRaw = (int)loadSingleSetting(regKeyWrapper, "IsTopMostWindow", 0);
+            IsTopMostWindow = isTopMostWindowRaw != 0;
         }
 
         public override void SaveSettings()
@@ -36,6 +42,7 @@ namespace Cider_x64
             saveSingleSetting(regKeyWrapper, "Top", Top);
             saveSingleSetting(regKeyWrapper, "Width", Width);
             saveSingleSetting(regKeyWrapper, "Height", Height);
+            saveSingleSetting(regKeyWrapper, "IsTopMostWindow", IsTopMostWindow ? 1 : 0);
         }
 
         public override bool ValidSettings()
@@ -49,10 +56,11 @@ namespace Cider_x64
             return valid;
         }
 
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public virtual int Left { get; set; }
+        public virtual int Top { get; set; }
+        public virtual int Width { get; set; }
+        public virtual int Height { get; set; }
+        public virtual bool IsTopMostWindow { get; set; }
 
         internal static readonly int UndefinedValue = -10000;
         protected override RegistryKeyWrapper getAppSettingsRegistrykey()

@@ -5,6 +5,7 @@ using TestStack.White.Factory;
 using System.IO;
 using TestStack.White.ScreenObjects;
 using System.Linq;
+using Microsoft.Win32;
 
 namespace Cider_x64.GuiTests
 {
@@ -14,6 +15,7 @@ namespace Cider_x64.GuiTests
         [TestMethod]
         public void AppStartup_WontCrash_WhenRegistryEmpty()
         {
+            StartApp();
             var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
 
             Assert.AreEqual(1, mainWindow.FileMenuChildItems.Count); // "Open" item only - for a clean installation
@@ -22,6 +24,7 @@ namespace Cider_x64.GuiTests
         [TestMethod]
         public void OpenAssembly_WillRestartApp_Always()
         {
+            StartApp();
             int processIdBeforeRestart = Application.Process.Id;
             string ciderx64ExePath = Application.Process.StartInfo.FileName;
             string sampleGuiDllPath = Path.Combine(Path.GetDirectoryName(ciderx64ExePath), @"Cider-x64.SampleGuiElements.dll");
@@ -40,6 +43,7 @@ namespace Cider_x64.GuiTests
         [TestMethod]
         public void TouchingAnAssembly_WillRestartAppOnlyOnce_WhenTouchingTheBinaryHundredTimesInARow()
         {
+            StartApp();
             string ciderx64ExePath = Application.Process.StartInfo.FileName;
             string sampleGuiDllPath = Path.Combine(Path.GetDirectoryName(ciderx64ExePath), @"Cider-x64.SampleGuiElements.dll");
             var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);

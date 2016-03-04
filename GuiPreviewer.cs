@@ -15,6 +15,8 @@ namespace Cider_x64
         {
             if (guiInstanceToCreatePreviewerFor is Window)
                 return new GuiPreviewerForWindow(guiInstanceToCreatePreviewerFor as Window);
+            else if (guiInstanceToCreatePreviewerFor is Page)
+                return new GuiPreviewerForPage(guiInstanceToCreatePreviewerFor as Page);
             else if (guiInstanceToCreatePreviewerFor is UserControl)
                 return new GuiPreviewerForUserControl(guiInstanceToCreatePreviewerFor as UserControl);
             return null;
@@ -28,7 +30,28 @@ namespace Cider_x64
         {
             m_PreviewerWindow = guiInstanceToCreatePreviewerFor;
             m_PreviewerWindow.ShowInTaskbar = false;
-            m_PreviewerWindow.Topmost = true;
+        }
+
+        public Window PreviewerWindow
+        {
+            get
+            {
+                return m_PreviewerWindow;
+            }
+        }
+    }
+
+    internal class GuiPreviewerForPage : IGuiPreviewer
+    {
+        Window m_PreviewerWindow;
+
+        public GuiPreviewerForPage(Page guiInstanceToCreatePreviewerFor)
+        {
+            m_PreviewerWindow = new Window()
+            {
+                Content = guiInstanceToCreatePreviewerFor,
+                ShowInTaskbar = false
+            };
         }
 
         public Window PreviewerWindow
@@ -49,7 +72,6 @@ namespace Cider_x64
             m_PreviewerWindow = new Window()
             {
                 Content = guiInstanceToCreatePreviewerFor,
-                Topmost = true,
                 ShowInTaskbar = false
             };
         }

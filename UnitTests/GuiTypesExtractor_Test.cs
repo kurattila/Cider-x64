@@ -81,13 +81,14 @@ namespace Cider_x64.UnitTests
         {
             var typesExtractor = new Fake_GuiTypesExtractor();
             typesExtractor.ForcedAllTypesInsideAssembly.Add(typeof(Window));
+            typesExtractor.ForcedAllTypesInsideAssembly.Add(typeof(Page));
             typesExtractor.ForcedAllTypesInsideAssembly.Add(typeof(System.IO.Stream));
             typesExtractor.ForcedAllTypesInsideAssembly.Add(typeof(System.Net.Sockets.Socket));
             typesExtractor.ForcedAllTypesInsideAssembly.Add(typeof(ResourceDictionary));
 
             var types = typesExtractor.GetGuiTypesOnly(new AssemblyWrapper());
 
-            Assert.AreEqual(1, types.Count);
+            Assert.AreEqual(2, types.Count);
         }
 
         class Fake_GuiTypesExtractor : GuiTypesExtractor

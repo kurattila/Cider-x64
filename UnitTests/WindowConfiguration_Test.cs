@@ -15,14 +15,16 @@ namespace Cider_x64.UnitTests
             winConfig.Top = 20;
             winConfig.Width = 30;
             winConfig.Height = 40;
+            winConfig.IsTopMostWindow = true;
 
             winConfig.SaveSettings();
 
-            Assert.AreEqual(4, winConfig.SettingsSaved.Count);
+            Assert.AreEqual(5, winConfig.SettingsSaved.Count);
             Assert.AreEqual(10, winConfig.SettingsSaved["Left"]);
             Assert.AreEqual(20, winConfig.SettingsSaved["Top"]);
             Assert.AreEqual(30, winConfig.SettingsSaved["Width"]);
             Assert.AreEqual(40, winConfig.SettingsSaved["Height"]);
+            Assert.AreEqual(1 /*true*/, winConfig.SettingsSaved["IsTopMostWindow"]);
         }
 
         [TestMethod]
@@ -33,6 +35,7 @@ namespace Cider_x64.UnitTests
             winConfig.ForcedSettingsToLoad["Top"] = 20;
             winConfig.ForcedSettingsToLoad["Width"] = 30;
             winConfig.ForcedSettingsToLoad["Height"] = 40;
+            winConfig.ForcedSettingsToLoad["IsTopMostWindow"] = 0 /*false*/;
 
             winConfig.LoadSettings();
 
@@ -50,6 +53,7 @@ namespace Cider_x64.UnitTests
             winConfig.ForcedSettingsToLoad["Top"] = 20;
             winConfig.ForcedSettingsToLoad["Width"] = 30;
             winConfig.ForcedSettingsToLoad["Height"] = 40;
+            winConfig.ForcedSettingsToLoad["IsTopMostWindow"] = 0 /*false*/;
 
             winConfig.LoadSettings();
 
@@ -120,15 +124,15 @@ namespace Cider_x64.UnitTests
         }
 
         public List<RegistryKeyWrapper> RegKeysSavedInto = new List<RegistryKeyWrapper>();
-        public Dictionary<string, int> SettingsSaved = new Dictionary<string, int>();
+        public Dictionary<string, object> SettingsSaved = new Dictionary<string, object>();
         protected override void saveSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId, object value)
         {
             RegKeysSavedInto.Add(regKeyWrapper);
-            SettingsSaved[settingId] = (int)value;
+            SettingsSaved[settingId] = value;
         }
 
         public List<RegistryKeyWrapper> RegKeysLoadedFrom = new List<RegistryKeyWrapper>();
-        public Dictionary<string, int> ForcedSettingsToLoad = new Dictionary<string, int>();
+        public Dictionary<string, object> ForcedSettingsToLoad = new Dictionary<string, object>();
         protected override object loadSingleSetting(RegistryKeyWrapper regKeyWrapper, string settingId, object defaultValue)
         {
             RegKeysLoadedFrom.Add(regKeyWrapper);

@@ -16,6 +16,8 @@ namespace Cider_x64
             {
                 if (   anyType == typeof(Window)
                     || anyType.InheritsFrom(typeof(Window))
+                    || anyType == typeof(Page)
+                    || anyType.InheritsFrom(typeof(Page))
                     || anyType == typeof(UserControl)
                     || anyType.InheritsFrom(typeof(UserControl))
                     )

@@ -8,7 +8,7 @@
         xmlns:helpers="clr-namespace:Cider_x64.Helpers"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
-        Title="Cider x64" Height="350" Width="525" d:DesignWidth="300" Topmost="True" >
+        Title="Cider x64" Height="350" Width="525" d:DesignWidth="300">
     <Window.Resources>
         <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
         <BooleanToVisibilityConverter x:Key="visibilityConverter" />
@@ -43,6 +43,9 @@
                     </Style.Triggers>
                     </Style>
                 </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Al_ways on Top" IsCheckable="True" IsChecked="{Binding IsTopMostMainWindow}" />
             </MenuItem>
         </Menu>
         <DockPanel LastChildFill="True" Margin="8">

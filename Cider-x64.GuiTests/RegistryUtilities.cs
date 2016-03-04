@@ -4,6 +4,9 @@ namespace Cider_x64.GuiTests
 {
     class RegistryUtilities
     {
+        public static string RegistryKeyName = "Cider-x64";
+        public static string RegistryBackupKeyName = "Cider-x64.Backup";
+
         /// <summary>
         /// Renames a sub-key of the passed in registry key since 
         /// the Framework totally forgot to include such a handy feature.

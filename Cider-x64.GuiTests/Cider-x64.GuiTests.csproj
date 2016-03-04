@@ -52,6 +52,7 @@
       <HintPath>..\packages\TestStack.White.ScreenObjects.0.13.3\lib\net40\TestStack.White.ScreenObjects.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="UIAutomationClient" />
     <Reference Include="UIAutomationTypes" />
   </ItemGroup>
   <Choose>
@@ -62,7 +63,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -73,6 +76,7 @@
     <Compile Include="UITestBase.cs" />
     <Compile Include="LoadAssembly_GuiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopMostWindow_GuiTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

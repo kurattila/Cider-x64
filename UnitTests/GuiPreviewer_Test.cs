@@ -28,6 +28,17 @@ namespace Cider_x64.UnitTests
             Assert.IsTrue(previewer is GuiPreviewerForUserControl);
             Assert.AreEqual(guiObject, previewer.PreviewerWindow.Content);
         }
+
+        [TestMethod]
+        public void Factory_WillCreatePreviewerForPage_WhenPageSpecified()
+        {
+            var guiObject = new Page();
+
+            IGuiPreviewer previewer = GuiPreviewerFactory.Create(guiObject);
+
+            Assert.IsTrue(previewer is GuiPreviewerForPage);
+            Assert.AreEqual(guiObject, previewer.PreviewerWindow.Content);
+        }
     }
 
     [TestClass]

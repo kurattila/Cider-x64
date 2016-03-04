@@ -10,6 +10,8 @@
         void Hide();
         void CloseWindow();
 
+        IConfigurableWindow GetConfigurableWindow();
+
         event System.EventHandler PreviewWindowClosed;
 
         /// <summary>

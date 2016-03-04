@@ -138,6 +138,20 @@ namespace Cider_x64
             }
         }
 
+        bool m_IsTopMostMainWindow;
+        public bool IsTopMostMainWindow
+        {
+            get { return m_IsTopMostMainWindow; }
+            set
+            {
+                if (m_IsTopMostMainWindow != value)
+                {
+                    m_IsTopMostMainWindow = value;
+                    NotifyPropertyChanged("IsTopMostMainWindow");
+                }
+            }
+        }
+
         [ExcludeFromCodeCoverage]
         protected virtual GuiTypeViewModel createGuiTypeViewModelInstance()
         {
