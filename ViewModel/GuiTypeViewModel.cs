@@ -45,7 +45,33 @@ namespace Cider_x64.ViewModel
                 {
                     m_NamespaceDotType = value;
                     NotifyPropertyChanged("NamespaceDotType");
+                    NotifyPropertyChanged("Namespace");
+                    NotifyPropertyChanged("Class");
                 }
+            }
+        }
+
+        public string Namespace
+        {
+            get
+            {
+                string namespacePart = "";
+                int lastDotPosition = m_NamespaceDotType.LastIndexOf('.');
+                if (lastDotPosition != -1)
+                    namespacePart = NamespaceDotType.Substring(0, lastDotPosition);
+                return namespacePart;
+            }
+        }
+
+        public string Class
+        {
+            get
+            {
+                string classPart = m_NamespaceDotType;
+                int lastDotPosition = m_NamespaceDotType.LastIndexOf('.');
+                if (lastDotPosition != -1)
+                    classPart = NamespaceDotType.Substring(lastDotPosition + 1);
+                return classPart;
             }
         }
 

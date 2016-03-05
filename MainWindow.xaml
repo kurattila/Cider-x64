@@ -6,12 +6,22 @@
         xmlns:local="clr-namespace:Cider_x64"
         xmlns:acb="clr-namespace:Cider_x64.Helpers.AttachedCommandBehavior"
         xmlns:helpers="clr-namespace:Cider_x64.Helpers"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         Title="Cider x64" Height="350" Width="525" d:DesignWidth="300">
     <Window.Resources>
         <CollectionViewSource x:Key="mruAssemblies" Source="{Binding FileMenuItems}" />
         <BooleanToVisibilityConverter x:Key="visibilityConverter" />
+        <CollectionViewSource x:Key="guiTypesGroupedViewSource"
+                              Source="{Binding Path=ListOfSelectedAssemblyTypes}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Namespace" />
+            </CollectionViewSource.SortDescriptions>
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Namespace" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top" AutomationProperties.AutomationId="mainMenu">
@@ -58,19 +68,13 @@
                     Width="Auto">Reload now (several changes detected at once)</Button>
 
             <TextBlock DockPanel.Dock="Top" 
-                        Text="Selected assembly :" />
-
-            <TextBlock DockPanel.Dock="Top" 
                         Margin="0,2,0,0"  
-                        Text="{Binding SelectedAssembly}" />
-
-            <TextBlock DockPanel.Dock="Top" 
-                        Margin="0,8,0,0" 
-                        Text="GUI types for preview :" />
+                        Text="{Binding SelectedAssembly}"
+                        ToolTip="Currently loaded assembly" />
 
             <Grid DockPanel.Dock="Top" Margin="0,8,0,0">
                 <ListBox x:Name="lbDllItemsList" 
-                            ItemsSource="{Binding Path=ListOfSelectedAssemblyTypes}">
+                            ItemsSource="{Binding Source={StaticResource guiTypesGroupedViewSource}}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -89,7 +93,7 @@
                                                         acb:CommandBehavior.CommandParameter="{Binding Path=., ElementName=showButton}">
                                     Show
                                 </local:PlayStopButton>
-                                <TextBlock x:Name="guiTypeName" Text="{Binding NamespaceDotType}" Margin="6,0,0,0" />
+                                <TextBlock x:Name="guiTypeName" Text="{Binding Class}" Margin="6,0,0,0" />
                             </DockPanel>
                             <DataTemplate.Triggers>
                                 <MultiDataTrigger>
@@ -107,6 +111,21 @@
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Foreground" Value="Gray" />
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate DataType="local:GuiTypeViewModel">
+                                    <TextBlock FontWeight="Bold" FontSize="16"
+                                               Text="{Binding Name}" /> <!-- Name is a property of CollectionViewGroup -->
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
                 </ListBox>
                 <TextBlock Text="{Binding TextualInfoForAssemblyTypes, FallbackValue=No WPF GUI types}" FontSize="18" Foreground="LightGray"
                            HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" >

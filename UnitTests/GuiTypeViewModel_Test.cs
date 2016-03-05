@@ -52,5 +52,74 @@ namespace Cider_x64.UnitTests
 
             Assert.AreEqual(new Rect(20, 30, 100, 110), rect);
         }
+
+        [TestMethod]
+        public void NamespacePart_WillReturnEmptyString_IfClassNotContainedInAnyNamespace()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "classname" };
+
+            string namespacePart = vm.Namespace;
+
+            Assert.AreEqual("", namespacePart);
+        }
+
+        [TestMethod]
+        public void NamespacePart_WillReturnNamespacePartOfClassName_IfClassContainedInNamespace()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "nsp.cls" };
+
+            string namespacePart = vm.Namespace;
+
+            Assert.AreEqual("nsp", namespacePart);
+        }
+
+        [TestMethod]
+        public void NamespacePart_DependsOnChangesOfNamespaceDotType_Always()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "nsp.cls" };
+            var notifiedProps = new List<string>();
+            vm.PropertyChanged += (sender, args) => notifiedProps.Add(args.PropertyName);
+
+            vm.NamespaceDotType = "nsp2.cls2";
+
+            Assert.AreEqual(2, notifiedProps.Count);
+            Assert.IsTrue(notifiedProps.Contains("NamespaceDotType"));
+            Assert.IsTrue(notifiedProps.Contains("Namespace"));
+        }
+
+        [TestMethod]
+        public void ClassPart_WillReturnClassName_IfClassNotContainedInAnyNamespace()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "classname" };
+
+            string classPart = vm.Class;
+
+            Assert.AreEqual("classname", classPart);
+        }
+
+        [TestMethod]
+        public void ClassPart_WillReturnClassPartOfClassName_IfClassContainedInNamespace()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "nsp.cls" };
+
+            string classPart = vm.Class;
+
+            Assert.AreEqual("cls", classPart);
+        }
+
+        [TestMethod]
+        public void ClassPart_DependsOnChangesOfNamespaceDotType_Always()
+        {
+            var vm = new GuiTypeViewModel() { NamespaceDotType = "nsp.cls" };
+            var notifiedProps = new List<string>();
+            vm.PropertyChanged += (sender, args) => notifiedProps.Add(args.PropertyName);
+
+            vm.NamespaceDotType = "nsp2.cls2";
+
+            Assert.AreEqual(3, notifiedProps.Count);
+            Assert.IsTrue(notifiedProps.Contains("NamespaceDotType"));
+            Assert.IsTrue(notifiedProps.Contains("Namespace"));
+            Assert.IsTrue(notifiedProps.Contains("Class"));
+        }
     }
 }
