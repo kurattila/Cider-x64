@@ -2,6 +2,7 @@
 {
     public interface ILoader
     {
+        void Init(System.IntPtr hwndMainWindow);
         void PreloadAssembly(string assemblyPath);
         void AddMergedDictionary(string packUriStringOfResDictXaml);
         void LoadAssembly(string assemblyPath);

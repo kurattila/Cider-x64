@@ -58,8 +58,8 @@ namespace Cider_x64.GuiTests
             var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
             mainWindow.SetViewMenuTopMostFlag(false); // go from 'true' => 'false'
 
-            var previewWindow = Application.GetWindow(SearchCriteria.ByText("Sample UserControl"), InitializeOption.NoCache);
-            bool previewIsTopMost = (bool) previewWindow.AutomationElement.GetCurrentPropertyValue(WindowPatternIdentifiers.IsTopmostProperty);
+            var previewWindowScreen = ScreenRepository.Get<PreviewWindow>(title => title == "Ciderx64SampleGuiElements.SampleUserControlRed", InitializeOption.NoCache);
+            bool previewIsTopMost = (bool)previewWindowScreen.GetWindow().AutomationElement.GetCurrentPropertyValue(WindowPatternIdentifiers.IsTopmostProperty);
             Assert.IsFalse(previewIsTopMost);
             Assert.IsFalse(mainWindow.IsTopMostWindow());
         }
@@ -76,8 +76,8 @@ namespace Cider_x64.GuiTests
             var mainWindow = ScreenRepository.Get<CiderX64Window>("Cider x64", InitializeOption.NoCache);
             mainWindow.SetViewMenuTopMostFlag(true); // go from 'false' => 'true'
 
-            var previewWindow = Application.GetWindow(SearchCriteria.ByText("Sample UserControl"), InitializeOption.NoCache);
-            bool previewIsTopMost = (bool) previewWindow.AutomationElement.GetCurrentPropertyValue(WindowPatternIdentifiers.IsTopmostProperty);
+            var previewWindowScreen = ScreenRepository.Get<PreviewWindow>(title => title == "Ciderx64SampleGuiElements.SampleUserControlRed", InitializeOption.NoCache);
+            bool previewIsTopMost = (bool)previewWindowScreen.GetWindow().AutomationElement.GetCurrentPropertyValue(WindowPatternIdentifiers.IsTopmostProperty);
             Assert.IsTrue(previewIsTopMost);
             Assert.IsTrue(mainWindow.IsTopMostWindow());
         }

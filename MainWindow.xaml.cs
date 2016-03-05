@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Windows.Interop;
 
 namespace Cider_x64
 {
@@ -28,7 +29,6 @@ namespace Cider_x64
 
             Initialized += MainWindow_Initialized;
             Closed += MainWindow_Closed;
-            StateChanged += MainWindow_StateChanged;
 
             this.DataContextChanged += new DependencyPropertyChangedEventHandler(MainViewDataContextChanged);
             this.DataContext = vm;
@@ -38,17 +38,6 @@ namespace Cider_x64
             this.Dispatcher.BeginInvoke(
                 new Action(() => { showGuiPreview(); })
                 , DispatcherPriority.SystemIdle);
-        }
-
-        private void MainWindow_StateChanged(object sender, EventArgs e)
-        {
-            if (m_Loader != null)
-            {
-                if (WindowState == WindowState.Minimized)
-                    m_Loader.Hide();
-                else
-                    m_Loader.Show();
-            }
         }
 
         void MainWindow_Initialized(object sender, EventArgs e)
@@ -104,11 +93,15 @@ namespace Cider_x64
         ILoader m_Loader;
         void showGuiPreview()
         {
+            var wihMainWindow = new WindowInteropHelper(this);
+            wihMainWindow.EnsureHandle();
+
             using (var waitIndicator = new WaitIndicator())
             {
                 waitIndicator.BeginWaiting(new MainWindowWaitIndicatorAppearance(), Left, Top, ActualWidth, ActualHeight);
 
                 m_Loader = m_LoaderFactory.Create();
+                m_Loader.Init(wihMainWindow.Handle);
                 m_ConfigurableWindowGuard.RegisterConfigurableWindow(m_Loader.GetConfigurableWindow(), new WindowConfiguration("PreviewWindow"));
 
                 if (!File.Exists(m_Project.AssemblyOfPreviewedGui))

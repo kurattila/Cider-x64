@@ -52,5 +52,10 @@ namespace Cider_x64.GuiTests.Screens
             object isTopMostRaw = Window.AutomationElement.GetCurrentPropertyValue(WindowPatternIdentifiers.IsTopmostProperty);
             return (bool)isTopMostRaw;
         }
+
+        public virtual IntPtr GetHwnd()
+        {
+            return new IntPtr((int)Window.AutomationElement.GetCurrentPropertyValue(AutomationElement.NativeWindowHandleProperty));
+        }
     }
 }

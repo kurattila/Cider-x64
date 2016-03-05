@@ -73,10 +73,12 @@
     <Compile Include="Screens\CiderX64Window.cs" />
     <Compile Include="RegistryUtilities.cs" />
     <Compile Include="Screens\FileOpenDialog.cs" />
+    <Compile Include="Screens\PreviewWindow.cs" />
     <Compile Include="UITestBase.cs" />
     <Compile Include="LoadAssembly_GuiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopMostWindow_GuiTests.cs" />
+    <Compile Include="OwnerWindow_GuiTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
