@@ -10,10 +10,16 @@ namespace Cider_x64
     {
         double CircleSize { get; }
         Brush Background { get; }
+        IntPtr OwnerHwnd { get; set; }
     }
 
     public class MainWindowWaitIndicatorAppearance : IWaitIndicatorAppearance
     {
+        public MainWindowWaitIndicatorAppearance(IntPtr ownerHwnd)
+        {
+            OwnerHwnd = ownerHwnd;
+        }
+
         public Brush Background
         {
             get { return Brushes.Black; }
@@ -23,10 +29,17 @@ namespace Cider_x64
         {
             get { return 50; }
         }
+
+        public IntPtr OwnerHwnd { get; set; }
     }
 
     public class PlayButtonWaitIndicatorAppearance : IWaitIndicatorAppearance
     {
+        public PlayButtonWaitIndicatorAppearance(IntPtr ownerHwnd)
+        {
+            OwnerHwnd = ownerHwnd;
+        }
+
         public Brush Background
         {
             get { return Brushes.Transparent; }
@@ -36,6 +49,8 @@ namespace Cider_x64
         {
             get { return 15; }
         }
+
+        public IntPtr OwnerHwnd { get; set; }
     }
 
     /// <summary>

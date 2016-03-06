@@ -14,7 +14,6 @@ namespace Cider_x64
         public MainViewModel()
         {
             ListOfSelectedAssemblyTypes.CollectionChanged += ListOfSelectedAssemblyTypes_CollectionChanged;
-            PlayButtonWaitIndicatorAppearance = new PlayButtonWaitIndicatorAppearance();
         }
 
         private void ListOfSelectedAssemblyTypes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

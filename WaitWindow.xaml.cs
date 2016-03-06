@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -66,6 +67,11 @@ namespace Cider_x64
             this.Width = width;
             this.Height = height;
             m_ViewModel.Appearance = appearance; // determine "appearance" yet before Show()
+
+            var wih = new System.Windows.Interop.WindowInteropHelper(this);
+            wih.EnsureHandle();
+            Win32.User32.SetWindowLongPtr(new HandleRef(wih, wih.Handle), Win32.User32.GWL_HWNDPARENT, appearance.OwnerHwnd);
+
             Show();
 
             m_ViewModel.WaitWindowVisualState = "Active";

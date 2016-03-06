@@ -106,7 +106,7 @@
                                 </MultiDataTrigger.Setters>
                                 </MultiDataTrigger>
                                 <DataTrigger Binding="{Binding IsShown}" Value="True">
-                                    <Setter TargetName="guiTypeName" Property="Foreground" Value="Blue"/>
+                                    <Setter TargetName="guiTypeName" Property="Foreground" Value="Black"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>

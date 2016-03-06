@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Data;
 using Cider_x64.Helpers;
@@ -82,8 +81,6 @@ namespace Cider_x64.UnitTests
 
             vm.NamespaceDotType = "nsp2.cls2";
 
-            Assert.AreEqual(2, notifiedProps.Count);
-            Assert.IsTrue(notifiedProps.Contains("NamespaceDotType"));
             Assert.IsTrue(notifiedProps.Contains("Namespace"));
         }
 
@@ -116,9 +113,6 @@ namespace Cider_x64.UnitTests
 
             vm.NamespaceDotType = "nsp2.cls2";
 
-            Assert.AreEqual(3, notifiedProps.Count);
-            Assert.IsTrue(notifiedProps.Contains("NamespaceDotType"));
-            Assert.IsTrue(notifiedProps.Contains("Namespace"));
             Assert.IsTrue(notifiedProps.Contains("Class"));
         }
     }

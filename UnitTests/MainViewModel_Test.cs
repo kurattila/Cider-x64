@@ -117,7 +117,7 @@ namespace Cider_x64.UnitTests
         {
             bool calledChangeTypeCommand = false;
             var vm = new MainViewModel();
-            vm.SetWaitIndicator(new WaitIndicator());
+            vm.SetWaitIndicator(new Mock<WaitIndicator>().Object);
             vm.InitWithGuiTypes(new List<string>() { "A.a", "B.b", "C.c" });
             var spyCommand = new Mock<ICommand>();
             spyCommand.Setup(c => c.Execute("A.a")).Callback(() => calledChangeTypeCommand = true);

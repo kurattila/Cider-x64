@@ -87,6 +87,7 @@
     <Compile Include="WaitWindow.xaml.cs">
       <DependentUpon>WaitWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Win32\User32.cs" />
     <Compile Include="WindowConfiguration.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

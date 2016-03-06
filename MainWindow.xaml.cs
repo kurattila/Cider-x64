@@ -3,8 +3,6 @@ using System.Windows;
 using System.IO;
 using System.Windows.Threading;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Interop;
 
@@ -98,7 +96,7 @@ namespace Cider_x64
 
             using (var waitIndicator = new WaitIndicator())
             {
-                waitIndicator.BeginWaiting(new MainWindowWaitIndicatorAppearance(), Left, Top, ActualWidth, ActualHeight);
+                waitIndicator.BeginWaiting(new MainWindowWaitIndicatorAppearance(wihMainWindow.Handle), Left, Top, ActualWidth, ActualHeight);
 
                 m_Loader = m_LoaderFactory.Create();
                 m_Loader.Init(wihMainWindow.Handle);
@@ -184,6 +182,10 @@ namespace Cider_x64
             }
             viewModel.SetRestartHandler(m_RestartHandler);
             viewModel.IsTopMostMainWindow = this.Topmost;
+
+            var wih = new WindowInteropHelper(this);
+            wih.EnsureHandle();
+            viewModel.PlayButtonWaitIndicatorAppearance = new PlayButtonWaitIndicatorAppearance(wih.Handle);
         }
 
         /// <summary>
