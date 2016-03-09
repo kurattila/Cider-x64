@@ -60,7 +60,7 @@ namespace Cider_x64
 {
     public static class VersionInfo
     {
-        public const string AssemblyVersion = "1.0.0";
-        public const string AssemblyFileVersion = "1.0.0";
+        public const string AssemblyVersion = "1.0.1";
+        public const string AssemblyFileVersion = "1.0.1";
     }
 }

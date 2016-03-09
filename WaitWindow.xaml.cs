@@ -42,6 +42,7 @@ namespace Cider_x64
         }
 
         AutoResetEvent m_WaitWindowClosedEvent;
+        Timer m_CloseTimer; // do _not_ use DispatcherTimer in a background thread: sometimes it just won't fire when there are no GUI events associated with that background thread!
         public void Close(AutoResetEvent waitWindowClosedEvent)
         {
             m_WaitWindowClosedEvent = waitWindowClosedEvent;
@@ -49,15 +50,14 @@ namespace Cider_x64
 
             Duration fadeDuration = (Duration)Resources["fadeDuration"];
 
-            var timer = new DispatcherTimer();
-            timer.Interval = fadeDuration.TimeSpan;
-            timer.Tick += onCloseTimerTick;
-            timer.Start();
+            m_CloseTimer = new Timer(onCloseTimerTick, null, TimeSpan.Zero, fadeDuration.TimeSpan);
         }
 
-        private void onCloseTimerTick(object sender, EventArgs e)
+        private void onCloseTimerTick(object state)
         {
-            base.Close();
+            m_CloseTimer.Dispose();
+
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => base.Close()));
         }
 
         public void Show(IWaitIndicatorAppearance appearance, double left, double top, double width, double height)
